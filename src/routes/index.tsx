@@ -170,12 +170,12 @@ function Home() {
         />
         <div className="mx-auto max-w-7xl px-4 pb-20 pt-16 text-primary-foreground sm:px-6 sm:pt-24 lg:pb-28 lg:pt-32">
           <div className="max-w-2xl">
-            <span className="inline-flex items-center gap-2 rounded-full border border-gold/40 bg-black/30 px-3 py-1 text-xs font-medium tracking-wider text-gold uppercase">
-              <Star className="h-3 w-3 fill-gold" /> Trusted in Khushab since 2015
+            <span className="inline-flex items-center gap-2 rounded-full border-2 border-black bg-white px-5 py-2 text-sm font-extrabold uppercase tracking-wider text-black shadow-lg sm:text-base">
+              <Star className="h-4 w-4 fill-black text-black" /> Trusted in Khushab since 2024
             </span>
             <h1 className="mt-5 font-display text-4xl font-black leading-[1.05] text-white sm:text-5xl lg:text-6xl">
               Original smartphones.<br />
-              <span className="text-gold">Honest prices.</span> Master repairs.
+              <span className="inline-block rounded-md bg-white px-3 py-1 font-black text-black shadow-lg">Honest prices.</span> Master repairs.
             </h1>
             <p className="mt-5 max-w-xl text-base text-white/80 sm:text-lg">
               Budget se le kar mid-range tak — har phone 100% genuine, tested aur warranty ke sath.
