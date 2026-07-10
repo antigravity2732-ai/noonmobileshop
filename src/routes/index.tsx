@@ -167,7 +167,7 @@ function Home() {
           <a
             href={whatsapp("Assalam o Alaikum, I want to inquire about a phone.")}
             className="hidden items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm transition hover:opacity-90 sm:inline-flex"
-          >
+           target="_blank" rel="noopener noreferrer">
             <MessageCircle className="h-4 w-4" /> WhatsApp
           </a>
         </div>
@@ -311,7 +311,7 @@ function Home() {
                   <a
                     href={whatsapp(`Assalam o Alaikum, I want to order ${p.name} (${fmt(p.price)}). Please confirm availability.`)}
                     className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3.5 py-2 text-xs font-semibold text-primary-foreground transition hover:opacity-90"
-                  >
+                   target="_blank" rel="noopener noreferrer">
                     <MessageCircle className="h-3.5 w-3.5" /> Order
                   </a>
                 </div>
@@ -335,10 +335,10 @@ function Home() {
               </p>
             </div>
             <div className="flex flex-wrap gap-3">
-              <a href={whatsapp("Assalam o Alaikum, I want to BUY a phone. Please guide me.")} className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow transition hover:opacity-90">
+              <a href={whatsapp("Assalam o Alaikum, I want to BUY a phone. Please guide me.")} className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow transition hover:opacity-90" target="_blank" rel="noopener noreferrer">
                 <MessageCircle className="h-4 w-4" /> Buy a Phone
               </a>
-              <a href={whatsapp("Assalam o Alaikum, I want to SELL my phone. Please give me a quote.")} className="inline-flex items-center gap-2 rounded-full border border-primary bg-background px-5 py-3 text-sm font-semibold text-primary transition hover:bg-primary/5">
+              <a href={whatsapp("Assalam o Alaikum, I want to SELL my phone. Please give me a quote.")} className="inline-flex items-center gap-2 rounded-full border border-primary bg-background px-5 py-3 text-sm font-semibold text-primary transition hover:bg-primary/5" target="_blank" rel="noopener noreferrer">
                 <MessageCircle className="h-4 w-4" /> Sell Your Phone
               </a>
             </div>
@@ -372,7 +372,7 @@ function Home() {
             <a
               href={whatsapp("I need a repair quote for my phone.")}
               className="mt-8 inline-flex items-center gap-2 rounded-full bg-gold px-6 py-3 text-sm font-semibold text-gold-foreground shadow-lg transition hover:brightness-105"
-            >
+             target="_blank" rel="noopener noreferrer">
               <MessageCircle className="h-4 w-4" /> Get a repair quote
             </a>
           </div>
@@ -467,7 +467,7 @@ function Home() {
         href={whatsapp("Assalam o Alaikum, I need help with a phone (buy / sell / repair).")}
         aria-label="Chat on WhatsApp"
         className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-2xl transition hover:scale-105"
-      >
+       target="_blank" rel="noopener noreferrer">
         <MessageCircle className="h-6 w-6" />
       </a>
     </div>
