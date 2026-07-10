@@ -122,6 +122,17 @@ function Home() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
+      {/* INTRO SPLASH — plays once per page load */}
+      <div className="intro-splash" aria-hidden="true">
+        <div className="intro-splash__ring" />
+        <div className="intro-splash__inner">
+          <img src={logo} alt="" className="intro-splash__logo" />
+          <div className="intro-splash__name">Noon Mobile</div>
+          <div className="intro-splash__line" />
+          <div className="intro-splash__sub">&amp; Repairing Shop</div>
+        </div>
+      </div>
+
       {/* NAV */}
       <header className="sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
