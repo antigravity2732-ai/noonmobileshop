@@ -119,6 +119,7 @@ function Home() {
   const [brand, setBrand] = useState("All");
   const [q, setQ] = useState("");
   const [sort, setSort] = useState<"popular" | "low" | "high">("popular");
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const filtered = useMemo(() => {
     let list = PHONES.filter((p) => p.price <= 100000);
