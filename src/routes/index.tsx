@@ -481,6 +481,65 @@ function Home() {
         </div>
       </section>
 
+      {/* ACCESSORIES */}
+      <section id="accessories" className="border-t border-border bg-secondary/40">
+        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:py-24">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div className="max-w-xl">
+              <p className="text-xs font-semibold uppercase tracking-widest text-accent">Mobile Accessories</p>
+              <h2 className="mt-2 font-display text-3xl font-bold sm:text-4xl">Har accessory — aik hi shop par</h2>
+              <p className="mt-3 text-muted-foreground">
+                Original handsfree, chargers, cables, memory cards, USB, covers, smart watches — sab kuch available. Retail &amp; wholesale rates ke liye WhatsApp par contact karein.
+              </p>
+            </div>
+            <a
+              href={whatsapp("Assalam o Alaikum, mujhe accessories ki price list chahiye.")}
+              className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow transition hover:opacity-90"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <MessageCircle className="h-4 w-4" /> Get full price list
+            </a>
+          </div>
+
+          <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {ACCESSORIES.map((a) => (
+              <article
+                key={a.id}
+                className="group flex flex-col rounded-2xl border border-border bg-card p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-lg"
+              >
+                <div className="flex items-start justify-between">
+                  <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-secondary text-2xl">{a.emoji}</span>
+                  <span className="rounded-full border border-border bg-background px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+                    {a.category}
+                  </span>
+                </div>
+                <h3 className="mt-4 font-display text-base font-bold leading-tight">{a.name}</h3>
+                <p className="mt-1.5 text-sm text-muted-foreground">{a.desc}</p>
+                <div className="mt-4 flex items-end justify-between border-t border-border pt-3">
+                  <div>
+                    <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Price range</div>
+                    <div className="font-display text-base font-bold text-primary">{a.price}</div>
+                  </div>
+                  <a
+                    href={whatsapp(`Assalam o Alaikum, I want to buy ${a.name} (${a.price}). Please share available options.`)}
+                    className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3 py-1.5 text-[11px] font-semibold text-primary-foreground transition hover:opacity-90"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <MessageCircle className="h-3 w-3" /> Order
+                  </a>
+                </div>
+              </article>
+            ))}
+          </div>
+
+          <p className="mt-8 text-center text-xs text-muted-foreground">
+            * Prices vary by brand &amp; model. Confirm the exact rate on WhatsApp before visiting the shop.
+          </p>
+        </div>
+      </section>
+
       {/* REPAIR */}
       <section id="services" className="bg-primary text-primary-foreground">
         <div className="mx-auto grid max-w-7xl gap-12 px-4 py-20 sm:px-6 lg:grid-cols-2 lg:py-28">
