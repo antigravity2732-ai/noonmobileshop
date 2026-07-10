@@ -104,10 +104,99 @@
 
 @utility shop-name {
   font-family: var(--font-brand);
-  background: linear-gradient(120deg, oklch(0.48 0.19 258), oklch(0.65 0.18 235));
+  background: linear-gradient(120deg, oklch(0.14 0 0), oklch(0.45 0 0));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
   letter-spacing: 0.01em;
   line-height: 1;
+}
+
+/* Intro splash — UGC-style brand reveal */
+@keyframes splashFade {
+  0%   { opacity: 1; visibility: visible; }
+  85%  { opacity: 1; }
+  100% { opacity: 0; visibility: hidden; }
+}
+@keyframes splashScale {
+  0%   { transform: scale(0.6); opacity: 0; filter: blur(12px); }
+  35%  { transform: scale(1.05); opacity: 1; filter: blur(0); }
+  70%  { transform: scale(1); opacity: 1; }
+  100% { transform: scale(1.08); opacity: 0; }
+}
+@keyframes splashLine {
+  0%   { width: 0; opacity: 0; }
+  40%  { width: 120px; opacity: 1; }
+  100% { width: 120px; opacity: 0; }
+}
+@keyframes splashSub {
+  0%, 25% { opacity: 0; transform: translateY(8px); }
+  55%     { opacity: 1; transform: translateY(0); }
+  90%     { opacity: 1; }
+  100%    { opacity: 0; }
+}
+@keyframes splashRing {
+  0%   { transform: scale(0.4); opacity: 0.6; }
+  100% { transform: scale(2.4); opacity: 0; }
+}
+
+.intro-splash {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 50% 50%, oklch(0.22 0 0) 0%, oklch(0.08 0 0) 70%);
+  animation: splashFade 2.6s ease forwards;
+  pointer-events: none;
+  overflow: hidden;
+}
+.intro-splash__ring {
+  position: absolute;
+  width: 260px;
+  height: 260px;
+  border-radius: 9999px;
+  border: 1px solid oklch(0.85 0 0 / 0.35);
+  animation: splashRing 2.2s ease-out forwards;
+}
+.intro-splash__logo {
+  width: 96px;
+  height: 96px;
+  object-fit: contain;
+  margin-bottom: 1rem;
+  filter: drop-shadow(0 6px 24px oklch(0 0 0 / 0.5));
+  animation: splashScale 2.6s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+}
+.intro-splash__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.intro-splash__name {
+  font-family: var(--font-brand);
+  font-size: clamp(3rem, 9vw, 5.5rem);
+  line-height: 1;
+  background: linear-gradient(120deg, #ffffff 0%, #a3a3a3 50%, #ffffff 100%);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: splashScale 2.6s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+}
+.intro-splash__line {
+  height: 2px;
+  background: linear-gradient(90deg, transparent, oklch(0.9 0 0), transparent);
+  margin: 0.85rem 0;
+  animation: splashLine 2.6s ease forwards;
+}
+.intro-splash__sub {
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  letter-spacing: 0.5em;
+  text-transform: uppercase;
+  color: oklch(0.85 0 0);
+  padding-left: 0.5em;
+  animation: splashSub 2.6s ease forwards;
 }
