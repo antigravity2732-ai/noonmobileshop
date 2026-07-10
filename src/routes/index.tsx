@@ -110,6 +110,40 @@ const SERVICES = [
   { icon: Wrench, title: "Board & Charging Repair", desc: "Micro-soldering, charging port & camera repair.", price: "From Rs. 1,800" },
 ];
 
+type Accessory = { id: string; name: string; category: string; price: string; desc: string; emoji: string };
+
+const ACCESSORIES: Accessory[] = [
+  { id: "handsfree",   emoji: "🎧", category: "Audio",     name: "Original Handsfree",           price: "Rs. 350 – 2,500",  desc: "Samsung, Oppo, Vivo, iPhone type-C & 3.5mm — original & A-grade options." },
+  { id: "airpods",     emoji: "🎧", category: "Audio",     name: "Bluetooth Earbuds / AirPods",   price: "Rs. 1,200 – 8,500", desc: "TWS earbuds, AirPods Pro copy & original — with warranty." },
+  { id: "neckband",    emoji: "🎧", category: "Audio",     name: "Bluetooth Neckband",            price: "Rs. 900 – 3,500",  desc: "JBL, Realme, Oraimo — long battery, HD mic." },
+  { id: "speaker",     emoji: "🔊", category: "Audio",     name: "Bluetooth Speaker",             price: "Rs. 1,500 – 9,000", desc: "JBL, Anker, Boat — bass-boost portable speakers." },
+
+  { id: "charger",     emoji: "🔌", category: "Charging",  name: "Original Charger (Fast)",       price: "Rs. 600 – 4,500",  desc: "Samsung 25W, Oppo VOOC, iPhone 20W PD, Xiaomi 33W & more." },
+  { id: "cable",       emoji: "🔗", category: "Charging",  name: "Data / Charging Cable",         price: "Rs. 150 – 1,200",  desc: "Type-C, Micro-USB, iPhone Lightning — fast-charge braided cables." },
+  { id: "powerbank",   emoji: "🔋", category: "Charging",  name: "Power Bank 10,000 – 20,000 mAh", price: "Rs. 1,800 – 6,500", desc: "Anker, Baseus, Romoss — PD fast charging." },
+  { id: "carcharge",   emoji: "🚗", category: "Charging",  name: "Car Charger",                   price: "Rs. 400 – 1,800",  desc: "Dual USB, Type-C PD & QC 3.0 car chargers." },
+  { id: "wireless",    emoji: "⚡", category: "Charging",  name: "Wireless Charger 15W",          price: "Rs. 1,500 – 3,500", desc: "Qi wireless pads for iPhone & Android." },
+
+  { id: "memory",      emoji: "💾", category: "Storage",   name: "Memory Card (SanDisk)",         price: "Rs. 450 – 3,500",  desc: "16GB, 32GB, 64GB, 128GB, 256GB Class-10 & Ultra." },
+  { id: "usb",         emoji: "💽", category: "Storage",   name: "USB Flash Drive",               price: "Rs. 500 – 2,800",  desc: "SanDisk, HP 16GB–128GB, USB 2.0 & 3.0." },
+  { id: "otg",         emoji: "🔌", category: "Storage",   name: "OTG / Card Reader",             price: "Rs. 200 – 900",    desc: "Type-C OTG, all-in-one SD + micro-SD card readers." },
+
+  { id: "cover",       emoji: "📱", category: "Protection", name: "Back Cover / Case",            price: "Rs. 250 – 2,500",  desc: "Silicone, hard-shell, magnetic & branded cases for every model." },
+  { id: "glass",       emoji: "🛡️", category: "Protection", name: "Tempered Glass Protector",     price: "Rs. 200 – 1,500",  desc: "9H, full-glue, matte, privacy & ceramic protectors — free installation." },
+  { id: "pouch",       emoji: "👜", category: "Protection", name: "Leather Wallet Pouch",         price: "Rs. 400 – 1,800",  desc: "Universal & model-fit leather pouches with card slots." },
+
+  { id: "holder",      emoji: "🚙", category: "Mounts",     name: "Mobile Car Holder",             price: "Rs. 500 – 2,000",  desc: "Dashboard, AC-vent & magnetic phone holders." },
+  { id: "selfie",      emoji: "🤳", category: "Mounts",     name: "Selfie Stick / Tripod",         price: "Rs. 700 – 3,500",  desc: "Bluetooth tripod with remote, ring-light tripod." },
+  { id: "ringlight",   emoji: "💡", category: "Mounts",     name: "Ring Light 10\"–18\"",           price: "Rs. 1,800 – 6,500", desc: "For TikTok, YouTube & video calls." },
+
+  { id: "smartwatch",  emoji: "⌚", category: "Wearables",  name: "Smart Watch",                   price: "Rs. 2,500 – 12,000", desc: "T500, HW68, Ultra series, Amazfit — call & fitness watches." },
+  { id: "band",        emoji: "📿", category: "Wearables",  name: "Fitness Band",                  price: "Rs. 1,200 – 5,000",  desc: "Mi Band, Realme Band — heart-rate & step tracking." },
+
+  { id: "simadapter",  emoji: "📶", category: "Extras",     name: "SIM Ejector + Adapter Kit",     price: "Rs. 100 – 400",    desc: "Nano / Micro / Standard sim adapters & ejector pins." },
+  { id: "cleaning",    emoji: "🧴", category: "Extras",     name: "Screen Cleaning Kit",           price: "Rs. 250 – 800",    desc: "Alcohol spray + microfiber cloth for phones & tablets." },
+  { id: "stylus",      emoji: "✏️", category: "Extras",     name: "Universal Stylus Pen",          price: "Rs. 400 – 1,500",  desc: "Capacitive stylus for iPad, tablets & smartphones." },
+];
+
 const WHATSAPP_NUMBER = "923265235786";
 const DISPLAY_NUMBER = "0326-5235786";
 
