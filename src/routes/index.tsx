@@ -151,11 +151,24 @@ function Home() {
       {/* NAV */}
       <header className="sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
-          <a href="#top" className="flex items-center gap-3">
-            <img src={logo} alt="Noon Mobile logo" width={44} height={44} className="h-11 w-11 rounded-md object-contain" />
-            <div className="leading-tight">
-              <div className="shop-name text-3xl font-normal sm:text-[2rem]">Noon Mobile</div>
-              <div className="text-[10px] font-semibold uppercase tracking-[0.32em] text-muted-foreground">&amp; Repairing Shop</div>
+          <a href="#top" className="flex items-center gap-3 sm:gap-4">
+            <img src={logo} alt="Noon Mobile logo" width={48} height={48} className="h-11 w-11 rounded-xl object-contain shadow-md sm:h-12 sm:w-12" />
+            <div className="flex flex-col border-l-2 border-black/10 pl-3 sm:pl-4">
+              <h1
+                className="text-2xl font-bold uppercase italic leading-none tracking-tighter text-foreground sm:text-3xl"
+                style={{ fontFamily: "'Space Grotesk', ui-sans-serif, system-ui, sans-serif" }}
+              >
+                Noon Mobile
+              </h1>
+              <div className="mt-1.5 flex items-center">
+                <span className="mr-2 h-[1px] w-4 bg-foreground" />
+                <span
+                  className="text-[9px] font-semibold uppercase tracking-[0.28em] text-muted-foreground sm:text-[10px]"
+                  style={{ fontFamily: "'Roboto Mono', ui-monospace, monospace" }}
+                >
+                  &amp; Repairing Shop
+                </span>
+              </div>
             </div>
           </a>
           <nav className="hidden gap-8 text-sm font-medium md:flex">
