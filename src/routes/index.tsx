@@ -14,11 +14,11 @@ export const Route = createFileRoute("/")({
   component: Home,
 });
 
-type Phone = {
+type PhoneItem = {
   id: string;
   brand: string;
   name: string;
-  price: number; // PKR
+  price: number;
   ram: string;
   storage: string;
   display: string;
@@ -27,8 +27,7 @@ type Phone = {
   camera: string;
 };
 
-// Real market prices (PKR) — Pakistan market, mid-2025 reference. All phones ≥ 20,000.
-const PHONES: Phone[] = [
+const PHONES: PhoneItem[] = [
   // Apple
   { id: "ip15pm", brand: "Apple", name: "iPhone 15 Pro Max 256GB", price: 549000, ram: "8GB", storage: "256GB", display: "6.7\" LTPO OLED 120Hz", battery: "4422 mAh", chip: "A17 Pro", camera: "48MP + 12MP + 12MP" },
   { id: "ip15", brand: "Apple", name: "iPhone 15 128GB", price: 305000, ram: "6GB", storage: "128GB", display: "6.1\" OLED", battery: "3349 mAh", chip: "A16 Bionic", camera: "48MP + 12MP" },
