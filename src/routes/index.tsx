@@ -128,8 +128,8 @@ function Home() {
           <a href="#top" className="flex items-center gap-3">
             <img src={logo} alt="Noon Mobile logo" width={44} height={44} className="h-11 w-11 rounded-md object-contain" />
             <div className="leading-tight">
-              <div className="font-display text-lg font-bold text-primary">Noon Mobile</div>
-              <div className="text-[11px] uppercase tracking-widest text-muted-foreground">& Repairing Shop</div>
+              <div className="shop-name text-3xl font-normal sm:text-[2rem]">Noon Mobile</div>
+              <div className="text-[10px] font-semibold uppercase tracking-[0.32em] text-muted-foreground">&amp; Repairing Shop</div>
             </div>
           </a>
           <nav className="hidden gap-8 text-sm font-medium md:flex">
@@ -152,7 +152,7 @@ function Home() {
         <div
           className="absolute inset-0 -z-10"
           style={{
-            backgroundImage: `linear-gradient(180deg, oklch(0.14 0.02 160 / 0.85), oklch(0.14 0.02 160 / 0.65)), url(${heroImg})`,
+            backgroundImage: `linear-gradient(180deg, oklch(0.16 0.09 258 / 0.88), oklch(0.22 0.14 258 / 0.7)), url(${heroImg})`,
             backgroundSize: "cover",
             backgroundPosition: "center",
           }}
