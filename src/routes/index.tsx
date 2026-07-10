@@ -163,7 +163,7 @@ function Home() {
         <div
           className="absolute inset-0 -z-10"
           style={{
-            backgroundImage: `linear-gradient(180deg, oklch(0.16 0.09 258 / 0.88), oklch(0.22 0.14 258 / 0.7)), url(${heroImg})`,
+            backgroundImage: `linear-gradient(180deg, oklch(0.08 0 0 / 0.88), oklch(0.14 0 0 / 0.7)), url(${heroImg})`,
             backgroundSize: "cover",
             backgroundPosition: "center",
           }}
