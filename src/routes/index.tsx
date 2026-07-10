@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Phone, MapPin, Clock, Wrench, ShieldCheck, Truck, Star, Search, MessageCircle } from "lucide-react";
+import { Phone, MapPin, Clock, Wrench, ShieldCheck, Star, Search, MessageCircle } from "lucide-react";
 import logo from "@/assets/logo.png";
 import heroImg from "@/assets/hero.jpg";
 import repairImg from "@/assets/repair.jpg";
@@ -25,63 +25,78 @@ type PhoneItem = {
   battery: string;
   chip: string;
   camera: string;
+  image: string;
 };
 
+const img = (slug: string) => `https://fdn2.gsmarena.com/vv/bigpic/${slug}.jpg`;
+
 const PHONES: PhoneItem[] = [
-  // Apple
-  { id: "ip15pm", brand: "Apple", name: "iPhone 15 Pro Max 256GB", price: 549000, ram: "8GB", storage: "256GB", display: "6.7\" LTPO OLED 120Hz", battery: "4422 mAh", chip: "A17 Pro", camera: "48MP + 12MP + 12MP" },
-  { id: "ip15", brand: "Apple", name: "iPhone 15 128GB", price: 305000, ram: "6GB", storage: "128GB", display: "6.1\" OLED", battery: "3349 mAh", chip: "A16 Bionic", camera: "48MP + 12MP" },
-  { id: "ip14", brand: "Apple", name: "iPhone 14 128GB", price: 259000, ram: "6GB", storage: "128GB", display: "6.1\" OLED", battery: "3279 mAh", chip: "A15 Bionic", camera: "12MP + 12MP" },
-  { id: "ip13", brand: "Apple", name: "iPhone 13 128GB", price: 199000, ram: "4GB", storage: "128GB", display: "6.1\" OLED", battery: "3240 mAh", chip: "A15 Bionic", camera: "12MP + 12MP" },
-  { id: "ip11", brand: "Apple", name: "iPhone 11 64GB", price: 105000, ram: "4GB", storage: "64GB", display: "6.1\" LCD", battery: "3110 mAh", chip: "A13 Bionic", camera: "12MP + 12MP" },
+  // Apple (used market, under 1 lakh)
+  { id: "ip11", brand: "Apple", name: "iPhone 11 64GB (PTA)", price: 98000, ram: "4GB", storage: "64GB", display: "6.1\" LCD", battery: "3110 mAh", chip: "A13 Bionic", camera: "12MP + 12MP", image: img("apple-iphone-11") },
+  { id: "ipxr", brand: "Apple", name: "iPhone XR 64GB", price: 62000, ram: "3GB", storage: "64GB", display: "6.1\" LCD", battery: "2942 mAh", chip: "A12 Bionic", camera: "12MP", image: img("apple-iphone-xr") },
+  { id: "ip8p", brand: "Apple", name: "iPhone 8 Plus 64GB", price: 39000, ram: "3GB", storage: "64GB", display: "5.5\" Retina", battery: "2691 mAh", chip: "A11 Bionic", camera: "12MP + 12MP", image: img("apple-iphone-8-plus") },
+  { id: "ip7", brand: "Apple", name: "iPhone 7 32GB", price: 22000, ram: "2GB", storage: "32GB", display: "4.7\" Retina", battery: "1960 mAh", chip: "A10 Fusion", camera: "12MP", image: img("apple-iphone-7") },
 
   // Samsung
-  { id: "s24u", brand: "Samsung", name: "Galaxy S24 Ultra 256GB", price: 429999, ram: "12GB", storage: "256GB", display: "6.8\" QHD+ AMOLED 120Hz", battery: "5000 mAh", chip: "Snapdragon 8 Gen 3", camera: "200MP quad" },
-  { id: "s24", brand: "Samsung", name: "Galaxy S24 256GB", price: 249999, ram: "8GB", storage: "256GB", display: "6.2\" FHD+ AMOLED", battery: "4000 mAh", chip: "Exynos 2400", camera: "50MP triple" },
-  { id: "a55", brand: "Samsung", name: "Galaxy A55 5G 8/256", price: 119999, ram: "8GB", storage: "256GB", display: "6.6\" AMOLED 120Hz", battery: "5000 mAh", chip: "Exynos 1480", camera: "50MP triple" },
-  { id: "a35", brand: "Samsung", name: "Galaxy A35 5G 8/128", price: 89999, ram: "8GB", storage: "128GB", display: "6.6\" AMOLED", battery: "5000 mAh", chip: "Exynos 1380", camera: "50MP triple" },
-  { id: "a15", brand: "Samsung", name: "Galaxy A15 4/128", price: 44999, ram: "4GB", storage: "128GB", display: "6.5\" Super AMOLED", battery: "5000 mAh", chip: "Helio G99", camera: "50MP triple" },
+  { id: "a35", brand: "Samsung", name: "Galaxy A35 5G 8/128", price: 89999, ram: "8GB", storage: "128GB", display: "6.6\" Super AMOLED 120Hz", battery: "5000 mAh", chip: "Exynos 1380", camera: "50MP triple", image: img("samsung-galaxy-a35") },
+  { id: "a25", brand: "Samsung", name: "Galaxy A25 5G 8/128", price: 74999, ram: "8GB", storage: "128GB", display: "6.5\" Super AMOLED", battery: "5000 mAh", chip: "Exynos 1280", camera: "50MP triple", image: img("samsung-galaxy-a25") },
+  { id: "a15", brand: "Samsung", name: "Galaxy A15 4/128", price: 44999, ram: "4GB", storage: "128GB", display: "6.5\" Super AMOLED 90Hz", battery: "5000 mAh", chip: "Helio G99", camera: "50MP triple", image: img("samsung-galaxy-a15") },
+  { id: "a05s", brand: "Samsung", name: "Galaxy A05s 4/64", price: 32999, ram: "4GB", storage: "64GB", display: "6.7\" 90Hz", battery: "5000 mAh", chip: "Snapdragon 680", camera: "50MP triple", image: img("samsung-galaxy-a05s") },
+  { id: "a05", brand: "Samsung", name: "Galaxy A05 4/64", price: 27999, ram: "4GB", storage: "64GB", display: "6.7\" HD+", battery: "5000 mAh", chip: "Helio G85", camera: "50MP dual", image: img("samsung-galaxy-a05") },
+  { id: "m14", brand: "Samsung", name: "Galaxy M14 4/128", price: 39999, ram: "4GB", storage: "128GB", display: "6.6\" FHD+ 90Hz", battery: "6000 mAh", chip: "Helio G99", camera: "50MP triple", image: img("samsung-galaxy-m14") },
 
-  // Xiaomi
-  { id: "mi14", brand: "Xiaomi", name: "Xiaomi 14 12/256", price: 264999, ram: "12GB", storage: "256GB", display: "6.36\" LTPO AMOLED", battery: "4610 mAh", chip: "Snapdragon 8 Gen 3", camera: "Leica 50MP triple" },
-  { id: "note13pro", brand: "Xiaomi", name: "Redmi Note 13 Pro 8/256", price: 74999, ram: "8GB", storage: "256GB", display: "6.67\" AMOLED 120Hz", battery: "5100 mAh", chip: "Helio G99 Ultra", camera: "200MP triple" },
-  { id: "note13", brand: "Xiaomi", name: "Redmi Note 13 8/256", price: 54999, ram: "8GB", storage: "256GB", display: "6.67\" AMOLED", battery: "5000 mAh", chip: "Snapdragon 685", camera: "108MP triple" },
-  { id: "redmi13c", brand: "Xiaomi", name: "Redmi 13C 4/128", price: 32999, ram: "4GB", storage: "128GB", display: "6.74\" HD+", battery: "5000 mAh", chip: "Helio G85", camera: "50MP triple" },
+  // Xiaomi / Redmi
+  { id: "note13pro", brand: "Xiaomi", name: "Redmi Note 13 Pro 8/256", price: 74999, ram: "8GB", storage: "256GB", display: "6.67\" AMOLED 120Hz", battery: "5100 mAh", chip: "Helio G99 Ultra", camera: "200MP triple", image: img("xiaomi-redmi-note-13-pro") },
+  { id: "note13", brand: "Xiaomi", name: "Redmi Note 13 8/256", price: 57999, ram: "8GB", storage: "256GB", display: "6.67\" AMOLED", battery: "5000 mAh", chip: "Snapdragon 685", camera: "108MP triple", image: img("xiaomi-redmi-note-13") },
+  { id: "redmi12", brand: "Xiaomi", name: "Redmi 12 4/128", price: 38999, ram: "4GB", storage: "128GB", display: "6.79\" FHD+ 90Hz", battery: "5000 mAh", chip: "Helio G88", camera: "50MP triple", image: img("xiaomi-redmi-12") },
+  { id: "redmi13c", brand: "Xiaomi", name: "Redmi 13C 4/128", price: 32999, ram: "4GB", storage: "128GB", display: "6.74\" HD+ 90Hz", battery: "5000 mAh", chip: "Helio G85", camera: "50MP triple", image: img("xiaomi-redmi-13c") },
+  { id: "redmia3", brand: "Xiaomi", name: "Redmi A3 3/64", price: 22999, ram: "3GB", storage: "64GB", display: "6.71\" 90Hz", battery: "5000 mAh", chip: "Helio G36", camera: "8MP dual", image: img("xiaomi-redmi-a3") },
 
   // Infinix
-  { id: "note40pro", brand: "Infinix", name: "Note 40 Pro 8/256", price: 69999, ram: "8GB", storage: "256GB", display: "6.78\" AMOLED 120Hz", battery: "5000 mAh", chip: "Helio G99 Ultra", camera: "108MP triple" },
-  { id: "hot40", brand: "Infinix", name: "Hot 40 Pro 8/256", price: 44999, ram: "8GB", storage: "256GB", display: "6.78\" 120Hz", battery: "5000 mAh", chip: "Helio G99", camera: "108MP triple" },
-  { id: "smart8", brand: "Infinix", name: "Smart 8 Pro 4/128", price: 26999, ram: "4GB", storage: "128GB", display: "6.6\" 90Hz", battery: "5000 mAh", chip: "Unisoc T606", camera: "50MP dual" },
+  { id: "hot40pro", brand: "Infinix", name: "Hot 40 Pro 8/256", price: 44999, ram: "8GB", storage: "256GB", display: "6.78\" FHD+ 120Hz", battery: "5000 mAh", chip: "Helio G99", camera: "108MP triple", image: img("infinix-hot-40-pro") },
+  { id: "hot40i", brand: "Infinix", name: "Hot 40i 8/128", price: 32999, ram: "8GB", storage: "128GB", display: "6.6\" 90Hz", battery: "5000 mAh", chip: "Unisoc T606", camera: "50MP dual", image: img("infinix-hot-40i") },
+  { id: "smart8pro", brand: "Infinix", name: "Smart 8 Pro 4/128", price: 26999, ram: "4GB", storage: "128GB", display: "6.6\" 90Hz", battery: "5000 mAh", chip: "Unisoc T606", camera: "50MP dual", image: img("infinix-smart-8-pro") },
+  { id: "smart8", brand: "Infinix", name: "Smart 8 3/64", price: 19999, ram: "3GB", storage: "64GB", display: "6.6\" 90Hz", battery: "5000 mAh", chip: "Unisoc T606", camera: "13MP", image: img("infinix-smart-8") },
 
   // Oppo
-  { id: "renoi11", brand: "Oppo", name: "Reno 11 8/256", price: 99999, ram: "8GB", storage: "256GB", display: "6.7\" AMOLED 120Hz", battery: "5000 mAh", chip: "Dimensity 7050", camera: "50MP triple" },
-  { id: "a78", brand: "Oppo", name: "Oppo A78 8/256", price: 54999, ram: "8GB", storage: "256GB", display: "6.43\" AMOLED", battery: "5000 mAh", chip: "Snapdragon 680", camera: "50MP dual" },
-  { id: "a18", brand: "Oppo", name: "Oppo A18 4/128", price: 34999, ram: "4GB", storage: "128GB", display: "6.56\" HD+ 90Hz", battery: "5000 mAh", chip: "Helio G85", camera: "8MP dual" },
+  { id: "a78", brand: "Oppo", name: "Oppo A78 8/128", price: 54999, ram: "8GB", storage: "128GB", display: "6.43\" AMOLED 90Hz", battery: "5000 mAh", chip: "Snapdragon 680", camera: "50MP dual", image: img("oppo-a78") },
+  { id: "a58", brand: "Oppo", name: "Oppo A58 6/128", price: 42999, ram: "6GB", storage: "128GB", display: "6.72\" FHD+ 90Hz", battery: "5000 mAh", chip: "Helio G85", camera: "50MP dual", image: img("oppo-a58") },
+  { id: "a18", brand: "Oppo", name: "Oppo A18 4/128", price: 34999, ram: "4GB", storage: "128GB", display: "6.56\" HD+ 90Hz", battery: "5000 mAh", chip: "Helio G85", camera: "8MP dual", image: img("oppo-a18") },
 
   // Vivo
-  { id: "v30", brand: "Vivo", name: "Vivo V30 12/256", price: 149999, ram: "12GB", storage: "256GB", display: "6.78\" AMOLED 120Hz", battery: "5000 mAh", chip: "Snapdragon 7 Gen 3", camera: "50MP triple" },
-  { id: "y28", brand: "Vivo", name: "Vivo Y28 8/128", price: 49999, ram: "8GB", storage: "128GB", display: "6.68\" 90Hz", battery: "6000 mAh", chip: "Helio G85", camera: "50MP dual" },
-  { id: "y18", brand: "Vivo", name: "Vivo Y18 4/128", price: 33999, ram: "4GB", storage: "128GB", display: "6.56\" 90Hz", battery: "5000 mAh", chip: "Helio G85", camera: "50MP dual" },
+  { id: "y28", brand: "Vivo", name: "Vivo Y28 8/128", price: 49999, ram: "8GB", storage: "128GB", display: "6.68\" FHD+ 90Hz", battery: "6000 mAh", chip: "Helio G85", camera: "50MP dual", image: img("vivo-y28") },
+  { id: "y18", brand: "Vivo", name: "Vivo Y18 4/128", price: 33999, ram: "4GB", storage: "128GB", display: "6.56\" 90Hz", battery: "5000 mAh", chip: "Helio G85", camera: "50MP dual", image: img("vivo-y18") },
+  { id: "y03", brand: "Vivo", name: "Vivo Y03 4/64", price: 24999, ram: "4GB", storage: "64GB", display: "6.56\" HD+", battery: "5000 mAh", chip: "Helio G85", camera: "13MP", image: img("vivo-y03") },
 
   // Tecno
-  { id: "camon30", brand: "Tecno", name: "Camon 30 8/256", price: 74999, ram: "8GB", storage: "256GB", display: "6.78\" AMOLED 120Hz", battery: "5000 mAh", chip: "Helio G99 Ultra", camera: "50MP triple" },
-  { id: "spark20", brand: "Tecno", name: "Spark 20 Pro 8/256", price: 49999, ram: "8GB", storage: "256GB", display: "6.78\" 120Hz", battery: "5000 mAh", chip: "Helio G99", camera: "108MP dual" },
+  { id: "spark20pro", brand: "Tecno", name: "Spark 20 Pro 8/256", price: 49999, ram: "8GB", storage: "256GB", display: "6.78\" FHD+ 120Hz", battery: "5000 mAh", chip: "Helio G99", camera: "108MP dual", image: img("tecno-spark-20-pro") },
+  { id: "spark20", brand: "Tecno", name: "Spark 20 8/128", price: 34999, ram: "8GB", storage: "128GB", display: "6.6\" 90Hz", battery: "5000 mAh", chip: "Helio G85", camera: "50MP dual", image: img("tecno-spark-20") },
+  { id: "camon20", brand: "Tecno", name: "Camon 20 8/256", price: 59999, ram: "8GB", storage: "256GB", display: "6.67\" AMOLED", battery: "5000 mAh", chip: "Helio G85", camera: "64MP triple", image: img("tecno-camon-20") },
 
-  // Realme / Honor / Nothing
-  { id: "realme12", brand: "Realme", name: "Realme 12 Pro+ 12/256", price: 129999, ram: "12GB", storage: "256GB", display: "6.7\" AMOLED 120Hz", battery: "5000 mAh", chip: "Snapdragon 7s Gen 2", camera: "50MP periscope" },
-  { id: "realmec67", brand: "Realme", name: "Realme C67 8/256", price: 54999, ram: "8GB", storage: "256GB", display: "6.72\" 90Hz", battery: "5000 mAh", chip: "Snapdragon 685", camera: "108MP dual" },
-  { id: "honorx9b", brand: "Honor", name: "Honor X9b 8/256", price: 89999, ram: "8GB", storage: "256GB", display: "6.78\" AMOLED 120Hz", battery: "5800 mAh", chip: "Snapdragon 6 Gen 1", camera: "108MP triple" },
-  { id: "nothing2a", brand: "Nothing", name: "Nothing Phone (2a) 12/256", price: 119999, ram: "12GB", storage: "256GB", display: "6.7\" AMOLED 120Hz", battery: "5000 mAh", chip: "Dimensity 7200 Pro", camera: "50MP dual" },
+  // Realme
+  { id: "c67", brand: "Realme", name: "Realme C67 8/256", price: 54999, ram: "8GB", storage: "256GB", display: "6.72\" FHD+ 90Hz", battery: "5000 mAh", chip: "Snapdragon 685", camera: "108MP dual", image: img("realme-c67") },
+  { id: "c53", brand: "Realme", name: "Realme C53 6/128", price: 37999, ram: "6GB", storage: "128GB", display: "6.74\" 90Hz", battery: "5000 mAh", chip: "Unisoc T612", camera: "50MP dual", image: img("realme-c53") },
+  { id: "note50", brand: "Realme", name: "Realme Note 50 4/128", price: 28999, ram: "4GB", storage: "128GB", display: "6.74\" 90Hz", battery: "5000 mAh", chip: "Unisoc T612", camera: "13MP dual", image: img("realme-note-50") },
+
+  // Honor
+  { id: "honorx6b", brand: "Honor", name: "Honor X6b 6/128", price: 32999, ram: "6GB", storage: "128GB", display: "6.56\" 90Hz", battery: "5200 mAh", chip: "Helio G36", camera: "50MP dual", image: img("honor-x6b") },
+  { id: "honorx5plus", brand: "Honor", name: "Honor X5 Plus 4/64", price: 24999, ram: "4GB", storage: "64GB", display: "6.56\" HD+", battery: "5000 mAh", chip: "Unisoc T606", camera: "13MP dual", image: img("honor-x5-plus") },
+
+  // Itel (budget)
+  { id: "itela70", brand: "itel", name: "itel A70 4/128", price: 19999, ram: "4GB", storage: "128GB", display: "6.6\" 90Hz", battery: "5000 mAh", chip: "Unisoc T603", camera: "13MP", image: img("itel-a70") },
 ];
 
-const BRANDS = ["All", "Apple", "Samsung", "Xiaomi", "Infinix", "Oppo", "Vivo", "Tecno", "Realme", "Honor", "Nothing"];
+const BRANDS = ["All", "Apple", "Samsung", "Xiaomi", "Infinix", "Oppo", "Vivo", "Tecno", "Realme", "Honor", "itel"];
 
 const SERVICES = [
   { icon: Wrench, title: "Screen Replacement", desc: "Original LCD & OLED panels with 30-day warranty.", price: "From Rs. 3,500" },
   { icon: ShieldCheck, title: "Battery Replacement", desc: "100% health original batteries for all brands.", price: "From Rs. 2,200" },
   { icon: Phone, title: "Software & IMEI Repair", desc: "Flashing, unlocking, iCloud & FRP solutions.", price: "From Rs. 1,500" },
-  { icon: Truck, title: "Free Home Delivery", desc: "COD available across Pakistan on all mobiles.", price: "Nationwide" },
+  { icon: Wrench, title: "Board & Charging Repair", desc: "Micro-soldering, charging port & camera repair.", price: "From Rs. 1,800" },
 ];
+
+const WHATSAPP_NUMBER = "923265235786";
+const DISPLAY_NUMBER = "0326-5235786";
 
 const fmt = (n: number) => "Rs. " + n.toLocaleString("en-PK");
 
@@ -91,7 +106,7 @@ function Home() {
   const [sort, setSort] = useState<"popular" | "low" | "high">("popular");
 
   const filtered = useMemo(() => {
-    let list = PHONES.filter((p) => p.price >= 20000);
+    let list = PHONES.filter((p) => p.price <= 100000);
     if (brand !== "All") list = list.filter((p) => p.brand === brand);
     if (q.trim()) {
       const s = q.toLowerCase();
@@ -103,7 +118,7 @@ function Home() {
   }, [brand, q, sort]);
 
   const whatsapp = (msg: string) =>
-    `https://wa.me/923001234567?text=${encodeURIComponent(msg)}`;
+    `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -145,15 +160,15 @@ function Home() {
         <div className="mx-auto max-w-7xl px-4 pb-20 pt-16 text-primary-foreground sm:px-6 sm:pt-24 lg:pb-28 lg:pt-32">
           <div className="max-w-2xl">
             <span className="inline-flex items-center gap-2 rounded-full border border-gold/40 bg-black/30 px-3 py-1 text-xs font-medium tracking-wider text-gold uppercase">
-              <Star className="h-3 w-3 fill-gold" /> Trusted since 2015
+              <Star className="h-3 w-3 fill-gold" /> Trusted in Khushab since 2015
             </span>
             <h1 className="mt-5 font-display text-4xl font-black leading-[1.05] text-white sm:text-5xl lg:text-6xl">
               Original smartphones.<br />
               <span className="text-gold">Honest prices.</span> Master repairs.
             </h1>
             <p className="mt-5 max-w-xl text-base text-white/80 sm:text-lg">
-              From flagship iPhones to budget Infinix — every device at Noon Mobile is 100% genuine,
-              tested, and backed by warranty. Repairs done in-shop by Muhammad Imran, with over a decade of experience.
+              Budget se le kar mid-range tak — har phone 100% genuine, tested aur warranty ke sath.
+              Repairs owner <strong className="text-white">Muhammad Imran</strong> khud handle karte hain.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <a href="#phones" className="rounded-full bg-gold px-6 py-3 text-sm font-semibold text-gold-foreground shadow-lg transition hover:brightness-105">
@@ -175,7 +190,7 @@ function Home() {
       {/* BRAND STRIP */}
       <section className="border-y border-border bg-secondary/50">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-x-10 gap-y-3 px-4 py-5 text-sm font-semibold uppercase tracking-widest text-muted-foreground sm:px-6">
-          {["Apple", "Samsung", "Xiaomi", "Infinix", "Oppo", "Vivo", "Tecno", "Realme", "Honor", "Nothing"].map((b) => (
+          {["Apple", "Samsung", "Xiaomi", "Infinix", "Oppo", "Vivo", "Tecno", "Realme", "Honor", "itel"].map((b) => (
             <span key={b} className="opacity-70 transition hover:opacity-100 hover:text-primary">{b}</span>
           ))}
         </div>
@@ -188,7 +203,7 @@ function Home() {
             <p className="text-xs font-semibold uppercase tracking-widest text-accent">Available now</p>
             <h2 className="mt-2 font-display text-3xl font-bold sm:text-4xl">Original mobiles in stock</h2>
             <p className="mt-3 text-muted-foreground">
-              {filtered.length} models from Rs. 20,000 and above — walk in, or order on WhatsApp for cash-on-delivery anywhere in Pakistan.
+              {filtered.length} models — budget se mid-range tak, sab 1 lakh se kam. Shop par tashreef laayein ya WhatsApp par order karein.
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
@@ -235,34 +250,45 @@ function Home() {
           {filtered.map((p) => (
             <article
               key={p.id}
-              className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-card p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-lg"
+              className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-lg"
             >
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-semibold uppercase tracking-widest text-accent">{p.brand}</span>
-                <span className="rounded-full bg-secondary px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-secondary-foreground">In Stock</span>
+              <div className="relative flex h-52 items-center justify-center bg-gradient-to-br from-secondary/60 to-background p-4">
+                <img
+                  src={p.image}
+                  alt={p.name}
+                  loading="lazy"
+                  className="max-h-full max-w-full object-contain drop-shadow-md transition group-hover:scale-105"
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).style.display = "none";
+                  }}
+                />
+                <span className="absolute left-3 top-3 rounded-full bg-secondary px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-secondary-foreground">In Stock</span>
               </div>
-              <h3 className="mt-2 font-display text-lg font-bold leading-tight">{p.name}</h3>
+              <div className="flex flex-1 flex-col p-5">
+                <span className="text-[11px] font-semibold uppercase tracking-widest text-accent">{p.brand}</span>
+                <h3 className="mt-1 font-display text-lg font-bold leading-tight">{p.name}</h3>
 
-              <ul className="mt-4 grid grid-cols-2 gap-y-1.5 text-xs text-muted-foreground">
-                <li><span className="text-foreground/80">Chip:</span> {p.chip}</li>
-                <li><span className="text-foreground/80">RAM:</span> {p.ram}</li>
-                <li className="col-span-2"><span className="text-foreground/80">Display:</span> {p.display}</li>
-                <li><span className="text-foreground/80">Battery:</span> {p.battery}</li>
-                <li><span className="text-foreground/80">Storage:</span> {p.storage}</li>
-                <li className="col-span-2"><span className="text-foreground/80">Camera:</span> {p.camera}</li>
-              </ul>
+                <ul className="mt-3 grid grid-cols-2 gap-y-1.5 text-xs text-muted-foreground">
+                  <li><span className="text-foreground/80">Chip:</span> {p.chip}</li>
+                  <li><span className="text-foreground/80">RAM:</span> {p.ram}</li>
+                  <li className="col-span-2"><span className="text-foreground/80">Display:</span> {p.display}</li>
+                  <li><span className="text-foreground/80">Battery:</span> {p.battery}</li>
+                  <li><span className="text-foreground/80">Storage:</span> {p.storage}</li>
+                  <li className="col-span-2"><span className="text-foreground/80">Camera:</span> {p.camera}</li>
+                </ul>
 
-              <div className="mt-5 flex items-end justify-between border-t border-border pt-4">
-                <div>
-                  <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Cash Price</div>
-                  <div className="font-display text-xl font-bold text-primary">{fmt(p.price)}</div>
+                <div className="mt-auto flex items-end justify-between border-t border-border pt-4">
+                  <div>
+                    <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Cash Price</div>
+                    <div className="font-display text-xl font-bold text-primary">{fmt(p.price)}</div>
+                  </div>
+                  <a
+                    href={whatsapp(`Assalam o Alaikum, I want to order ${p.name} (${fmt(p.price)}). Please confirm availability.`)}
+                    className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3.5 py-2 text-xs font-semibold text-primary-foreground transition hover:opacity-90"
+                  >
+                    <MessageCircle className="h-3.5 w-3.5" /> Order
+                  </a>
                 </div>
-                <a
-                  href={whatsapp(`Assalam o Alaikum, I want to order ${p.name} (${fmt(p.price)}). Please confirm availability.`)}
-                  className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3.5 py-2 text-xs font-semibold text-primary-foreground transition hover:opacity-90"
-                >
-                  <MessageCircle className="h-3.5 w-3.5" /> Order
-                </a>
               </div>
             </article>
           ))}
@@ -271,6 +297,27 @@ function Home() {
         {filtered.length === 0 && (
           <p className="mt-16 text-center text-muted-foreground">No models match your filters. Try another brand.</p>
         )}
+
+        {/* Buy / Sell CTA */}
+        <div className="mt-14 rounded-3xl border border-border bg-gradient-to-br from-primary/5 via-gold/5 to-transparent p-8 sm:p-10">
+          <div className="flex flex-wrap items-center justify-between gap-6">
+            <div className="max-w-xl">
+              <h3 className="font-display text-2xl font-bold sm:text-3xl">Phone kharidna ya bechna hai?</h3>
+              <p className="mt-2 text-muted-foreground">
+                Best rate ke liye seedha WhatsApp par contact karein — <strong className="text-foreground">{DISPLAY_NUMBER}</strong>.
+                Used phone ki fair valuation shop par mint mein.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <a href={whatsapp("Assalam o Alaikum, I want to BUY a phone. Please guide me.")} className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow transition hover:opacity-90">
+                <MessageCircle className="h-4 w-4" /> Buy a Phone
+              </a>
+              <a href={whatsapp("Assalam o Alaikum, I want to SELL my phone. Please give me a quote.")} className="inline-flex items-center gap-2 rounded-full border border-primary bg-background px-5 py-3 text-sm font-semibold text-primary transition hover:bg-primary/5">
+                <MessageCircle className="h-4 w-4" /> Sell Your Phone
+              </a>
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* REPAIR */}
@@ -311,15 +358,14 @@ function Home() {
         <div className="grid gap-12 lg:grid-cols-[1.1fr_1fr] lg:items-center">
           <div>
             <p className="text-xs font-semibold uppercase tracking-widest text-accent">The Owner</p>
-            <h2 className="mt-2 font-display text-3xl font-bold sm:text-4xl">Muhammad Imran — 12 years serving the community.</h2>
+            <h2 className="mt-2 font-display text-3xl font-bold sm:text-4xl">Muhammad Imran — Khushab ki trusted mobile shop.</h2>
             <p className="mt-5 text-muted-foreground">
-              What began as a small counter in the neighborhood market has grown into one of the most trusted mobile destinations
-              in the city. Muhammad Imran built Noon Mobile on three simple rules: <em>never sell a copy phone</em>,
-              <em> never overcharge</em>, and <em>never hand back a device unless it's fixed properly.</em>
+              Noon Mobile ki bunyaad teen simple usoolon par rakhi gayi hai: <em>kabhi copy phone nahi</em>,
+              <em> kabhi zyada price nahi</em>, aur <em>repair hamesha genuine parts ke sath</em>.
             </p>
             <p className="mt-4 text-muted-foreground">
-              Today the shop stocks every major brand — Apple, Samsung, Xiaomi, Infinix, Oppo, Vivo, Tecno, Realme, Honor and Nothing —
-              at real market rates, with EMI options and cash-on-delivery across Pakistan.
+              Har major brand — Apple, Samsung, Xiaomi, Infinix, Oppo, Vivo, Tecno, Realme, Honor aur itel — real market rates par available.
+              Buying, selling aur repair — sab kuch aik hi jaga.
             </p>
             <div className="mt-8 grid grid-cols-3 gap-6 border-t border-border pt-8">
               <div><div className="font-display text-3xl font-bold text-primary">12+</div><div className="mt-1 text-xs uppercase tracking-widest text-muted-foreground">Years experience</div></div>
@@ -347,14 +393,22 @@ function Home() {
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground"><MapPin className="h-5 w-5" /></div>
             <div>
               <h3 className="font-display text-lg font-bold">Visit the Shop</h3>
-              <p className="mt-1 text-sm text-muted-foreground">Noon Mobile & Repairing Shop<br />Main Bazaar Road, Pakistan</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Noon Mobile &amp; Repairing Shop<br />
+                Khaliqabad, Jauharabad City<br />
+                District Khushab, Punjab
+              </p>
             </div>
           </div>
           <div className="flex gap-4">
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground"><Phone className="h-5 w-5" /></div>
             <div>
               <h3 className="font-display text-lg font-bold">Call / WhatsApp</h3>
-              <p className="mt-1 text-sm text-muted-foreground">+92 300 123 4567<br />Muhammad Imran (Owner)</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                <a href={`tel:+${WHATSAPP_NUMBER}`} className="hover:text-primary">{DISPLAY_NUMBER}</a><br />
+                Muhammad Imran (Owner)<br />
+                <span className="text-xs">Buy • Sell • Repair — WhatsApp anytime</span>
+              </p>
             </div>
           </div>
           <div className="flex gap-4">
@@ -372,7 +426,7 @@ function Home() {
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 py-8 text-sm text-muted-foreground sm:flex-row sm:px-6">
           <div className="flex items-center gap-3">
             <img src={logo} alt="" width={32} height={32} className="h-8 w-8 object-contain" />
-            <span>© {new Date().getFullYear()} Noon Mobile & Repairing Shop. All rights reserved.</span>
+            <span>© {new Date().getFullYear()} Noon Mobile &amp; Repairing Shop, Khaliqabad Jauharabad. All rights reserved.</span>
           </div>
           <div className="flex gap-6">
             <a href="#phones" className="hover:text-primary">Phones</a>
@@ -384,7 +438,7 @@ function Home() {
 
       {/* Floating WhatsApp */}
       <a
-        href={whatsapp("Assalam o Alaikum, I need help with a phone.")}
+        href={whatsapp("Assalam o Alaikum, I need help with a phone (buy / sell / repair).")}
         aria-label="Chat on WhatsApp"
         className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-2xl transition hover:scale-105"
       >
