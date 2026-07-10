@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Phone, MapPin, Clock, Wrench, ShieldCheck, Star, Search, MessageCircle } from "lucide-react";
+import { Phone, MapPin, Clock, Wrench, ShieldCheck, Star, Search, MessageCircle, Menu, X } from "lucide-react";
 import logo from "@/assets/logo.png";
 import heroImg from "@/assets/hero.jpg";
 import repairImg from "@/assets/repair.jpg";
@@ -119,6 +119,7 @@ function Home() {
   const [brand, setBrand] = useState("All");
   const [q, setQ] = useState("");
   const [sort, setSort] = useState<"popular" | "low" | "high">("popular");
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const filtered = useMemo(() => {
     let list = PHONES.filter((p) => p.price <= 100000);
@@ -149,42 +150,129 @@ function Home() {
       </div>
 
       {/* NAV */}
-      <header className="sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
+      <header className="sticky top-0 z-50 border-b border-border bg-background/90 backdrop-blur-md">
+        {/* Top utility strip */}
+        <div className="hidden border-b border-border/60 bg-secondary/60 text-[11px] text-muted-foreground md:block">
+          <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-1.5">
+            <div className="flex items-center gap-4">
+              <span className="inline-flex items-center gap-1.5">
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
+                <span className="font-semibold uppercase tracking-widest text-foreground">Shop Open</span>
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <MapPin className="h-3 w-3" /> Khaliqabad, Jauharabad, Khushab
+              </span>
+            </div>
+            <div className="flex items-center gap-4">
+              <span className="inline-flex items-center gap-1.5">
+                <Clock className="h-3 w-3" /> Mon–Sat: 10 AM – 10 PM
+              </span>
+              <a href={`tel:+${WHATSAPP_NUMBER}`} className="inline-flex items-center gap-1.5 font-semibold text-foreground hover:text-primary">
+                <Phone className="h-3 w-3" /> {DISPLAY_NUMBER}
+              </a>
+            </div>
+          </div>
+        </div>
+
+        {/* Main bar */}
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
           <a href="#top" className="flex items-center gap-3 sm:gap-4">
-            <img src={logo} alt="Noon Mobile logo" width={48} height={48} className="h-11 w-11 rounded-xl object-contain shadow-md sm:h-12 sm:w-12" />
-            <div className="flex flex-col border-l-2 border-black/10 pl-3 sm:pl-4">
+            <div className="relative shrink-0">
+              <img
+                src={logo}
+                alt="Noon Mobile logo"
+                width={48}
+                height={48}
+                className="h-11 w-11 rounded-full border border-border bg-white object-contain shadow-sm sm:h-12 sm:w-12"
+              />
+              <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-background bg-emerald-500" />
+            </div>
+            <div className="flex flex-col">
               <h1
-                className="text-2xl font-bold uppercase italic leading-none tracking-tighter text-foreground sm:text-3xl"
+                className="text-xl font-bold uppercase italic leading-none tracking-tighter text-foreground sm:text-2xl"
                 style={{ fontFamily: "'Space Grotesk', ui-sans-serif, system-ui, sans-serif" }}
               >
                 Noon Mobile
               </h1>
-              <div className="mt-1.5 flex items-center">
-                <span className="mr-2 h-[1px] w-4 bg-foreground" />
-                <span
-                  className="text-[9px] font-semibold uppercase tracking-[0.28em] text-muted-foreground sm:text-[10px]"
-                  style={{ fontFamily: "'Roboto Mono', ui-monospace, monospace" }}
-                >
-                  &amp; Repairing Shop
-                </span>
-              </div>
+              <span
+                className="mt-1 text-[9px] font-semibold uppercase tracking-[0.28em] text-muted-foreground sm:text-[10px]"
+                style={{ fontFamily: "'Roboto Mono', ui-monospace, monospace" }}
+              >
+                &amp; Repairing Shop
+              </span>
             </div>
           </a>
-          <nav className="hidden gap-8 text-sm font-medium md:flex">
-            <a href="#phones" className="hover:text-primary">Phones</a>
-            <a href="#services" className="hover:text-primary">Repair</a>
-            <a href="#about" className="hover:text-primary">About</a>
-            <a href="#visit" className="hover:text-primary">Visit</a>
+
+          {/* Desktop nav */}
+          <nav className="hidden items-center gap-1 rounded-full border border-border bg-secondary/40 px-2 py-1 lg:flex">
+            {[
+              { href: "#phones", label: "Phones" },
+              { href: "#services", label: "Repair" },
+              { href: "#about", label: "About" },
+              { href: "#visit", label: "Visit" },
+            ].map((l) => (
+              <a
+                key={l.href}
+                href={l.href}
+                className="rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-muted-foreground transition hover:bg-background hover:text-foreground"
+              >
+                {l.label}
+              </a>
+            ))}
           </nav>
-          <a
-            href={whatsapp("Assalam o Alaikum, I want to inquire about a phone.")}
-            className="hidden items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm transition hover:opacity-90 sm:inline-flex"
-           target="_blank" rel="noopener noreferrer">
-            <MessageCircle className="h-4 w-4" /> WhatsApp
-          </a>
+
+          {/* Right actions */}
+          <div className="flex items-center gap-2">
+            <a
+              href={whatsapp("Assalam o Alaikum, I want to inquire about a phone.")}
+              className="inline-flex items-center gap-2 rounded-full bg-primary px-3 py-2 text-xs font-bold uppercase tracking-wider text-primary-foreground shadow-sm transition hover:opacity-90 sm:px-4 sm:text-sm"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <MessageCircle className="h-4 w-4" />
+              <span className="hidden xs:inline sm:inline">WhatsApp</span>
+            </a>
+            <button
+              type="button"
+              onClick={() => setMenuOpen((v) => !v)}
+              aria-label="Toggle menu"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background text-foreground transition hover:bg-secondary lg:hidden"
+            >
+              {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
+          </div>
         </div>
+
+        {/* Mobile menu */}
+        {menuOpen && (
+          <div className="border-t border-border bg-background lg:hidden">
+            <nav className="mx-auto flex max-w-7xl flex-col divide-y divide-border px-2 sm:px-4">
+              {[
+                { href: "#phones", label: "Phones" },
+                { href: "#services", label: "Repair" },
+                { href: "#about", label: "About" },
+                { href: "#visit", label: "Visit" },
+              ].map((l) => (
+                <a
+                  key={l.href}
+                  href={l.href}
+                  onClick={() => setMenuOpen(false)}
+                  className="px-3 py-3 text-sm font-semibold uppercase tracking-widest text-foreground transition hover:text-primary"
+                >
+                  {l.label}
+                </a>
+              ))}
+              <a
+                href={`tel:+${WHATSAPP_NUMBER}`}
+                className="flex items-center gap-2 px-3 py-3 text-sm font-semibold text-muted-foreground"
+              >
+                <Phone className="h-4 w-4" /> {DISPLAY_NUMBER}
+              </a>
+            </nav>
+          </div>
+        )}
       </header>
+
 
       {/* HERO */}
       <section id="top" className="relative overflow-hidden">
