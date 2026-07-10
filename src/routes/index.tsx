@@ -241,6 +241,7 @@ function Home() {
           <nav className="hidden items-center gap-1 rounded-full border border-border bg-secondary/40 px-2 py-1 lg:flex">
             {[
               { href: "#phones", label: "Phones" },
+              { href: "#accessories", label: "Accessories" },
               { href: "#services", label: "Repair" },
               { href: "#about", label: "About" },
               { href: "#visit", label: "Visit" },
