@@ -97,3 +97,17 @@
   }
   h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.02em; }
 }
+
+@utility font-brand {
+  font-family: var(--font-brand);
+}
+
+@utility shop-name {
+  font-family: var(--font-brand);
+  background: linear-gradient(120deg, oklch(0.48 0.19 258), oklch(0.65 0.18 235));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  letter-spacing: 0.01em;
+  line-height: 1;
+}
