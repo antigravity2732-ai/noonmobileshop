@@ -82,11 +82,26 @@ const PHONES: PhoneItem[] = [
   { id: "honorx6b", brand: "Honor", name: "Honor X6b 6/128", price: 32999, ram: "6GB", storage: "128GB", display: "6.56\" 90Hz", battery: "5200 mAh", chip: "Helio G36", camera: "50MP dual", image: img("honor-x6b") },
   { id: "honorx5plus", brand: "Honor", name: "Honor X5 Plus 4/64", price: 24999, ram: "4GB", storage: "64GB", display: "6.56\" HD+", battery: "5000 mAh", chip: "Unisoc T606", camera: "13MP dual", image: img("honor-x5-plus") },
 
-  // Itel (budget)
+  // Budget bracket (Rs. 10,000 – 20,000)
   { id: "itela70", brand: "itel", name: "itel A70 4/128", price: 19999, ram: "4GB", storage: "128GB", display: "6.6\" 90Hz", battery: "5000 mAh", chip: "Unisoc T603", camera: "13MP", image: img("itel-a70") },
+  { id: "itelvision3", brand: "itel", name: "itel Vision 3 3/64", price: 16999, ram: "3GB", storage: "64GB", display: "6.6\" HD+", battery: "5000 mAh", chip: "Unisoc SC9863A", camera: "8MP dual", image: img("itel-vision-3") },
+  { id: "itela50", brand: "itel", name: "itel A50 2/64", price: 13499, ram: "2GB", storage: "64GB", display: "6.6\" HD+", battery: "5000 mAh", chip: "Unisoc T603", camera: "8MP", image: img("itel-a50") },
+  { id: "itela25", brand: "itel", name: "itel A25 2/32", price: 10499, ram: "2GB", storage: "32GB", display: "5.0\" HD", battery: "3020 mAh", chip: "Spreadtrum SC9832E", camera: "5MP", image: img("itel-a25") },
+  { id: "tecnopop8", brand: "Tecno", name: "Tecno POP 8 3/64", price: 18999, ram: "3GB", storage: "64GB", display: "6.6\" 90Hz", battery: "5000 mAh", chip: "Unisoc T606", camera: "8MP dual", image: img("tecno-pop-8") },
+  { id: "sparkgo24", brand: "Tecno", name: "Spark Go 2024 3/64", price: 17999, ram: "3GB", storage: "64GB", display: "6.6\" 90Hz", battery: "5000 mAh", chip: "Unisoc T606", camera: "13MP dual", image: img("tecno-spark-go-2024") },
+  { id: "infhot30i", brand: "Infinix", name: "Infinix Hot 30i 4/128", price: 27999, ram: "4GB", storage: "128GB", display: "6.56\" 90Hz", battery: "5000 mAh", chip: "Helio G37", camera: "13MP dual", image: img("infinix-hot-30i") },
+  { id: "infsmart7", brand: "Infinix", name: "Infinix Smart 7 HD 2/64", price: 17999, ram: "2GB", storage: "64GB", display: "6.6\" HD+", battery: "5000 mAh", chip: "Unisoc SC9863A1", camera: "8MP", image: img("infinix-smart-7-hd") },
+  { id: "vivoy02t", brand: "Vivo", name: "Vivo Y02t 4/64", price: 22999, ram: "4GB", storage: "64GB", display: "6.51\" HD+", battery: "5000 mAh", chip: "Helio P35", camera: "8MP", image: img("vivo-y02t") },
+  { id: "vivoy02", brand: "Vivo", name: "Vivo Y02 3/32", price: 18499, ram: "3GB", storage: "32GB", display: "6.51\" HD+", battery: "5000 mAh", chip: "Helio P22", camera: "8MP", image: img("vivo-y02") },
+  { id: "realmec30s", brand: "Realme", name: "Realme C30s 2/32", price: 16999, ram: "2GB", storage: "32GB", display: "6.5\" HD+", battery: "5000 mAh", chip: "Unisoc SC9863A1", camera: "8MP", image: img("realme-c30s") },
+  { id: "redmia2", brand: "Xiaomi", name: "Redmi A2 2/32", price: 17499, ram: "2GB", storage: "32GB", display: "6.52\" HD+", battery: "5000 mAh", chip: "Helio G36", camera: "8MP dual", image: img("xiaomi-redmi-a2") },
+  { id: "redmi9a", brand: "Xiaomi", name: "Redmi 9A 2/32", price: 15999, ram: "2GB", storage: "32GB", display: "6.53\" HD+", battery: "5000 mAh", chip: "Helio G25", camera: "13MP", image: img("xiaomi-redmi-9a") },
+  { id: "nokiac22", brand: "Nokia", name: "Nokia C22 3/64", price: 22999, ram: "3GB", storage: "64GB", display: "6.52\" HD+", battery: "5000 mAh", chip: "Unisoc T606", camera: "13MP dual", image: img("nokia-c22") },
+  { id: "nokiac12", brand: "Nokia", name: "Nokia C12 2/64", price: 17999, ram: "2GB", storage: "64GB", display: "6.3\" HD+", battery: "3000 mAh", chip: "Unisoc SC9863A1", camera: "8MP", image: img("nokia-c12") },
+  { id: "samsa04e", brand: "Samsung", name: "Galaxy A04e 3/32", price: 24999, ram: "3GB", storage: "32GB", display: "6.5\" HD+", battery: "5000 mAh", chip: "Helio P35", camera: "13MP dual", image: img("samsung-galaxy-a04e") },
 ];
 
-const BRANDS = ["All", "Apple", "Samsung", "Xiaomi", "Infinix", "Oppo", "Vivo", "Tecno", "Realme", "Honor", "itel"];
+const BRANDS = ["All", "Apple", "Samsung", "Xiaomi", "Infinix", "Oppo", "Vivo", "Tecno", "Realme", "Honor", "Nokia", "itel"];
 
 const SERVICES = [
   { icon: Wrench, title: "Screen Replacement", desc: "Original LCD & OLED panels with 30-day warranty.", price: "From Rs. 3,500" },
@@ -201,7 +216,7 @@ function Home() {
       {/* BRAND STRIP */}
       <section className="border-y border-border bg-secondary/50">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-x-10 gap-y-3 px-4 py-5 text-sm font-semibold uppercase tracking-widest text-muted-foreground sm:px-6">
-          {["Apple", "Samsung", "Xiaomi", "Infinix", "Oppo", "Vivo", "Tecno", "Realme", "Honor", "itel"].map((b) => (
+          {["Apple", "Samsung", "Xiaomi", "Infinix", "Oppo", "Vivo", "Tecno", "Realme", "Honor", "Nokia", "itel"].map((b) => (
             <span key={b} className="opacity-70 transition hover:opacity-100 hover:text-primary">{b}</span>
           ))}
         </div>
