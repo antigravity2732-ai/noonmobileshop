@@ -128,8 +128,8 @@ function Home() {
           <a href="#top" className="flex items-center gap-3">
             <img src={logo} alt="Noon Mobile logo" width={44} height={44} className="h-11 w-11 rounded-md object-contain" />
             <div className="leading-tight">
-              <div className="font-display text-lg font-bold text-primary">Noon Mobile</div>
-              <div className="text-[11px] uppercase tracking-widest text-muted-foreground">& Repairing Shop</div>
+              <div className="shop-name text-3xl font-normal sm:text-[2rem]">Noon Mobile</div>
+              <div className="text-[10px] font-semibold uppercase tracking-[0.32em] text-muted-foreground">&amp; Repairing Shop</div>
             </div>
           </a>
           <nav className="hidden gap-8 text-sm font-medium md:flex">
