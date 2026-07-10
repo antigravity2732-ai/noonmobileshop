@@ -38,29 +38,29 @@
 
 :root {
   --radius: 0.75rem;
-  /* Crisp white + electric blue */
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.18 0.04 255);
+  /* Black + grey monochrome */
+  --background: oklch(0.99 0 0);
+  --foreground: oklch(0.14 0 0);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.18 0.04 255);
+  --card-foreground: oklch(0.14 0 0);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.18 0.04 255);
-  --primary: oklch(0.48 0.19 258);
-  --primary-foreground: oklch(0.99 0.005 255);
-  --secondary: oklch(0.965 0.015 255);
-  --secondary-foreground: oklch(0.28 0.08 258);
-  --muted: oklch(0.96 0.012 255);
-  --muted-foreground: oklch(0.5 0.04 255);
-  --accent: oklch(0.62 0.18 250);
-  --accent-foreground: oklch(0.99 0.005 255);
-  /* "gold" token repurposed as bright sky-blue accent */
-  --gold: oklch(0.72 0.15 240);
-  --gold-foreground: oklch(0.16 0.05 258);
+  --popover-foreground: oklch(0.14 0 0);
+  --primary: oklch(0.16 0 0);
+  --primary-foreground: oklch(0.98 0 0);
+  --secondary: oklch(0.95 0 0);
+  --secondary-foreground: oklch(0.2 0 0);
+  --muted: oklch(0.94 0 0);
+  --muted-foreground: oklch(0.48 0 0);
+  --accent: oklch(0.35 0 0);
+  --accent-foreground: oklch(0.98 0 0);
+  /* "gold" token repurposed as light silver highlight */
+  --gold: oklch(0.78 0 0);
+  --gold-foreground: oklch(0.14 0 0);
   --destructive: oklch(0.55 0.22 27);
-  --destructive-foreground: oklch(0.98 0.003 247);
-  --border: oklch(0.92 0.02 255);
-  --input: oklch(0.92 0.02 255);
-  --ring: oklch(0.48 0.19 258);
+  --destructive-foreground: oklch(0.98 0 0);
+  --border: oklch(0.9 0 0);
+  --input: oklch(0.9 0 0);
+  --ring: oklch(0.35 0 0);
 }
 
 .dark {
