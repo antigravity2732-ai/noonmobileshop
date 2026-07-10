@@ -284,6 +284,7 @@ function Home() {
             <nav className="mx-auto flex max-w-7xl flex-col divide-y divide-border px-2 sm:px-4">
               {[
                 { href: "#phones", label: "Phones" },
+                { href: "#accessories", label: "Accessories" },
                 { href: "#services", label: "Repair" },
                 { href: "#about", label: "About" },
                 { href: "#visit", label: "Visit" },
