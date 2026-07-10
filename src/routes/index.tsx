@@ -216,7 +216,7 @@ function Home() {
       {/* BRAND STRIP */}
       <section className="border-y border-border bg-secondary/50">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-x-10 gap-y-3 px-4 py-5 text-sm font-semibold uppercase tracking-widest text-muted-foreground sm:px-6">
-          {["Apple", "Samsung", "Xiaomi", "Infinix", "Oppo", "Vivo", "Tecno", "Realme", "Honor", "itel"].map((b) => (
+          {["Apple", "Samsung", "Xiaomi", "Infinix", "Oppo", "Vivo", "Tecno", "Realme", "Honor", "Nokia", "itel"].map((b) => (
             <span key={b} className="opacity-70 transition hover:opacity-100 hover:text-primary">{b}</span>
           ))}
         </div>
