@@ -320,28 +320,51 @@ function Home() {
             backgroundPosition: "center",
           }}
         />
-        {/* Animated floating phones background */}
+        {/* Premium animated hero background */}
         <div className="pointer-events-none absolute inset-0 -z-[5] overflow-hidden" aria-hidden="true">
+          {/* Soft blue/purple light blobs */}
+          <div className="hero-blob hero-blob--a" />
+          <div className="hero-blob hero-blob--b" />
+          <div className="hero-blob hero-blob--c" />
+
+          {/* Glowing circuit lines */}
+          <svg className="absolute inset-0 h-full w-full opacity-[0.18]" viewBox="0 0 1200 800" preserveAspectRatio="none" aria-hidden="true">
+            <defs>
+              <linearGradient id="circuitGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stopColor="#7dd3fc" stopOpacity="0.9" />
+                <stop offset="50%" stopColor="#a78bfa" stopOpacity="0.7" />
+                <stop offset="100%" stopColor="#60a5fa" stopOpacity="0.5" />
+              </linearGradient>
+              <filter id="circuitGlow"><feGaussianBlur stdDeviation="2.2" /></filter>
+            </defs>
+            <g stroke="url(#circuitGrad)" strokeWidth="1.2" fill="none" filter="url(#circuitGlow)">
+              <path className="circuit-line" d="M120 220 L280 220 L320 260 L520 260 L560 300 L740 300" strokeDasharray="6 10" />
+              <path className="circuit-line circuit-line--slow" d="M180 620 L360 620 L400 580 L620 580 L660 540 L900 540" strokeDasharray="4 12" />
+              <path className="circuit-line circuit-line--slower" d="M980 140 L980 260 L1040 300 L1040 460" strokeDasharray="3 9" />
+              <path className="circuit-line" d="M80 460 L200 460 L240 500 L240 640" strokeDasharray="5 11" />
+            </g>
+            <g fill="#a5b4fc">
+              <circle cx="280" cy="220" r="2.5"><animate attributeName="opacity" values="0.3;1;0.3" dur="4s" repeatCount="indefinite" /></circle>
+              <circle cx="620" cy="580" r="2.5"><animate attributeName="opacity" values="0.3;1;0.3" dur="5s" repeatCount="indefinite" /></circle>
+              <circle cx="1040" cy="300" r="2.5"><animate attributeName="opacity" values="0.3;1;0.3" dur="6s" repeatCount="indefinite" /></circle>
+              <circle cx="240" cy="500" r="2.5"><animate attributeName="opacity" values="0.3;1;0.3" dur="4.5s" repeatCount="indefinite" /></circle>
+            </g>
+          </svg>
+
+          {/* Floating glassmorphic phones */}
           {[
-            { left: "4%",  w: 60, dur: 22, delay: 0,  r: -12, o: 0.18, hue: "#e5e7eb" },
-            { left: "14%", w: 44, dur: 28, delay: 6,  r: 8,   o: 0.14, hue: "#facc15" },
-            { left: "22%", w: 72, dur: 20, delay: 3,  r: -6,  o: 0.20, hue: "#ffffff" },
-            { left: "32%", w: 50, dur: 26, delay: 10, r: 14,  o: 0.15, hue: "#94a3b8" },
-            { left: "42%", w: 64, dur: 24, delay: 2,  r: -18, o: 0.17, hue: "#fef3c7" },
-            { left: "52%", w: 40, dur: 30, delay: 8,  r: 10,  o: 0.13, hue: "#e5e7eb" },
-            { left: "62%", w: 68, dur: 22, delay: 5,  r: -4,  o: 0.19, hue: "#ffffff" },
-            { left: "72%", w: 48, dur: 27, delay: 12, r: 16,  o: 0.14, hue: "#facc15" },
-            { left: "80%", w: 56, dur: 21, delay: 1,  r: -10, o: 0.18, hue: "#e5e7eb" },
-            { left: "88%", w: 44, dur: 29, delay: 7,  r: 6,   o: 0.15, hue: "#ffffff" },
-            { left: "94%", w: 60, dur: 23, delay: 4,  r: -14, o: 0.16, hue: "#94a3b8" },
-            { left: "8%",  w: 38, dur: 32, delay: 14, r: 20,  o: 0.12, hue: "#facc15" },
+            { left: "6%",  top: "18%", w: 130, dur: 22, delay: 0,  r: -14, o: 0.14 },
+            { left: "26%", top: "58%", w: 110, dur: 28, delay: 4,  r: 10,  o: 0.12 },
+            { left: "48%", top: "12%", w: 150, dur: 26, delay: 2,  r: -6,  o: 0.13 },
+            { left: "70%", top: "52%", w: 120, dur: 30, delay: 6,  r: 12,  o: 0.14 },
+            { left: "86%", top: "22%", w: 100, dur: 24, delay: 3,  r: -18, o: 0.11 },
           ].map((p, i) => (
             <div
               key={i}
-              className="floating-phone"
+              className="glass-phone"
               style={{
                 left: p.left,
-                bottom: "-20%",
+                top: p.top,
                 width: `${p.w}px`,
                 ["--dur" as string]: `${p.dur}s`,
                 ["--delay" as string]: `${p.delay}s`,
@@ -349,15 +372,60 @@ function Home() {
                 ["--o" as string]: p.o,
               }}
             >
-              <svg viewBox="0 0 40 76" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-auto">
-                <rect x="1" y="1" width="38" height="74" rx="7" ry="7" fill="none" stroke={p.hue} strokeWidth="1.5" />
-                <rect className="screen" x="3.5" y="7" width="33" height="58" rx="3" fill={p.hue} opacity="0.5" />
-                <rect x="15" y="3.2" width="10" height="2.2" rx="1.1" fill={p.hue} opacity="0.6" />
-                <circle cx="20" cy="70" r="1.6" fill={p.hue} opacity="0.6" />
-              </svg>
+              <div className="glass-phone__body">
+                <div className="glass-phone__notch" />
+                <div className="glass-phone__screen" />
+              </div>
             </div>
           ))}
+
+          {/* Floating tech icons */}
+          {[
+            { Icon: Battery,  left: "12%", top: "72%", dur: 18, delay: 0 },
+            { Icon: Camera,   left: "38%", top: "26%", dur: 22, delay: 3 },
+            { Icon: Cpu,      left: "58%", top: "70%", dur: 20, delay: 5 },
+            { Icon: Wifi,     left: "78%", top: "18%", dur: 24, delay: 2 },
+            { Icon: Zap,      left: "92%", top: "62%", dur: 19, delay: 4 },
+          ].map(({ Icon, left, top, dur, delay }, i) => (
+            <div
+              key={i}
+              className="tech-icon"
+              style={{
+                left, top,
+                ["--dur" as string]: `${dur}s`,
+                ["--delay" as string]: `${delay}s`,
+              }}
+            >
+              <Icon className="h-5 w-5" strokeWidth={1.4} />
+            </div>
+          ))}
+
+          {/* Tiny floating particles */}
+          {Array.from({ length: 24 }).map((_, i) => {
+            const left = (i * 37) % 100;
+            const top = (i * 53) % 100;
+            const dur = 12 + (i % 7) * 2;
+            const delay = (i % 9);
+            const size = 2 + (i % 3);
+            const hue = i % 3 === 0 ? "#c4b5fd" : i % 3 === 1 ? "#93c5fd" : "#e0e7ff";
+            return (
+              <span
+                key={`p-${i}`}
+                className="hero-particle"
+                style={{
+                  left: `${left}%`,
+                  top: `${top}%`,
+                  width: `${size}px`,
+                  height: `${size}px`,
+                  background: hue,
+                  ["--dur" as string]: `${dur}s`,
+                  ["--delay" as string]: `${delay}s`,
+                }}
+              />
+            );
+          })}
         </div>
+
         <div className="relative mx-auto max-w-7xl px-4 pb-20 pt-16 text-primary-foreground sm:px-6 sm:pt-24 lg:pb-28 lg:pt-32">
           <div className="max-w-2xl">
             <span className="inline-flex items-center gap-2 rounded-full border-2 border-black bg-white px-5 py-2 text-sm font-extrabold uppercase tracking-wider text-black shadow-lg sm:text-base">
