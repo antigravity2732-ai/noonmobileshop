@@ -320,7 +320,45 @@ function Home() {
             backgroundPosition: "center",
           }}
         />
-        <div className="mx-auto max-w-7xl px-4 pb-20 pt-16 text-primary-foreground sm:px-6 sm:pt-24 lg:pb-28 lg:pt-32">
+        {/* Animated floating phones background */}
+        <div className="pointer-events-none absolute inset-0 -z-[5] overflow-hidden" aria-hidden="true">
+          {[
+            { left: "4%",  w: 60, dur: 22, delay: 0,  r: -12, o: 0.18, hue: "#e5e7eb" },
+            { left: "14%", w: 44, dur: 28, delay: 6,  r: 8,   o: 0.14, hue: "#facc15" },
+            { left: "22%", w: 72, dur: 20, delay: 3,  r: -6,  o: 0.20, hue: "#ffffff" },
+            { left: "32%", w: 50, dur: 26, delay: 10, r: 14,  o: 0.15, hue: "#94a3b8" },
+            { left: "42%", w: 64, dur: 24, delay: 2,  r: -18, o: 0.17, hue: "#fef3c7" },
+            { left: "52%", w: 40, dur: 30, delay: 8,  r: 10,  o: 0.13, hue: "#e5e7eb" },
+            { left: "62%", w: 68, dur: 22, delay: 5,  r: -4,  o: 0.19, hue: "#ffffff" },
+            { left: "72%", w: 48, dur: 27, delay: 12, r: 16,  o: 0.14, hue: "#facc15" },
+            { left: "80%", w: 56, dur: 21, delay: 1,  r: -10, o: 0.18, hue: "#e5e7eb" },
+            { left: "88%", w: 44, dur: 29, delay: 7,  r: 6,   o: 0.15, hue: "#ffffff" },
+            { left: "94%", w: 60, dur: 23, delay: 4,  r: -14, o: 0.16, hue: "#94a3b8" },
+            { left: "8%",  w: 38, dur: 32, delay: 14, r: 20,  o: 0.12, hue: "#facc15" },
+          ].map((p, i) => (
+            <div
+              key={i}
+              className="floating-phone"
+              style={{
+                left: p.left,
+                bottom: "-20%",
+                width: `${p.w}px`,
+                ["--dur" as string]: `${p.dur}s`,
+                ["--delay" as string]: `${p.delay}s`,
+                ["--r" as string]: `${p.r}deg`,
+                ["--o" as string]: p.o,
+              }}
+            >
+              <svg viewBox="0 0 40 76" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-auto">
+                <rect x="1" y="1" width="38" height="74" rx="7" ry="7" fill="none" stroke={p.hue} strokeWidth="1.5" />
+                <rect className="screen" x="3.5" y="7" width="33" height="58" rx="3" fill={p.hue} opacity="0.5" />
+                <rect x="15" y="3.2" width="10" height="2.2" rx="1.1" fill={p.hue} opacity="0.6" />
+                <circle cx="20" cy="70" r="1.6" fill={p.hue} opacity="0.6" />
+              </svg>
+            </div>
+          ))}
+        </div>
+        <div className="relative mx-auto max-w-7xl px-4 pb-20 pt-16 text-primary-foreground sm:px-6 sm:pt-24 lg:pb-28 lg:pt-32">
           <div className="max-w-2xl">
             <span className="inline-flex items-center gap-2 rounded-full border-2 border-black bg-white px-5 py-2 text-sm font-extrabold uppercase tracking-wider text-black shadow-lg sm:text-base">
               <Star className="h-4 w-4 fill-black text-black" /> Trusted in Khushab since 2024
