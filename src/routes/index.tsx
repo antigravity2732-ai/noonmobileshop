@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Phone, MapPin, Clock, Wrench, ShieldCheck, Star, Search, MessageCircle, Menu, X } from "lucide-react";
+import { Phone, MapPin, Clock, Wrench, ShieldCheck, Star, Search, MessageCircle, Menu, X, Battery, Camera, Cpu, Wifi, Zap } from "lucide-react";
 import logo from "@/assets/logo.png";
 import heroImg from "@/assets/hero.jpg";
 import repairImg from "@/assets/repair.jpg";
