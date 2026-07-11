@@ -325,3 +325,35 @@
   will-change: transform, opacity;
 }
 
+/* ── Mobile Responsive Tweaks ──────────────────────── */
+@media (max-width: 640px) {
+  .intro-splash__name {
+    font-size: clamp(2.2rem, 12vw, 4rem);
+  }
+  .intro-splash__logo {
+    width: 72px;
+    height: 72px;
+  }
+}
+
+/* Smooth scroll for anchor links */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Focus visible for accessibility */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--color-background); }
+::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 9999px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-muted-foreground); }
+
+/* Print media: hide non-essential elements */
+@media print {
+  .intro-splash, .hero-blob, .fixed { display: none !important; }
+}
