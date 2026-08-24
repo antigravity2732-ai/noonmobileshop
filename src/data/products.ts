@@ -2,7 +2,7 @@ import { Wrench, ShieldCheck, Phone } from "lucide-react";
 
 export type PhoneItem = {
   id: string;
-  brand: string;
+  brand?: string;
   name: string;
   description?: string;
   price?: number;
@@ -12,16 +12,25 @@ export type PhoneItem = {
   battery?: string;
   chip?: string;
   camera?: string;
-  image: string;
+  image?: string;
 };
 
 export type KeypadPhone = {
   id: string;
-  brand: string;
+  brand?: string;
   name: string;
   description?: string;
-  image: string;
+  price?: number;
+  image?: string;
 };
+
+export const DEFAULT_PHONE_IMAGE = "https://images.unsplash.com/photo-1580910051074-3eb694886505?w=400&q=80";
+
+export const fmt = (n?: number | null): string => {
+  if (n === null || n === undefined || isNaN(n) || n <= 0) return "";
+  return "Rs. " + n.toLocaleString("en-PK");
+};
+
 
 
 
@@ -98,7 +107,8 @@ export const PHONES: PhoneItem[] = [
   { id: "samsa04e", brand: "Samsung", name: "Galaxy A04e 3/32", price: 24999, ram: "3GB", storage: "32GB", display: "6.5\" HD+", battery: "5000 mAh", chip: "Helio P35", camera: "13MP dual", image: img("samsung-galaxy-a04e") },
 ];
 
-export const BRANDS = ["All", "Apple", "Samsung", "Xiaomi", "Infinix", "Oppo", "Vivo", "Tecno", "Realme", "Honor", "Nokia", "itel"];
+export const BRANDS = ["All", "Apple", "Samsung", "Xiaomi", "Infinix", "Oppo", "Vivo", "Tecno", "Realme", "Honor", "Nokia", "itel", "Other"];
+
 
 export const KEYPAD_PHONES: KeypadPhone[] = [
   // Nokia

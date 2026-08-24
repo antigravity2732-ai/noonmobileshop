@@ -5,7 +5,10 @@ import {
   Smartphone, Phone, Eye, Edit2, Trash2, Search, X, Save, ChevronDown, Plus,
 } from "lucide-react";
 import logo from "@/assets/logo.png";
-import { PHONES, BRANDS, SERVICES, ACCESSORIES, KEYPAD_PHONES, PhoneItem, KeypadPhone } from "@/data/products";
+import {
+  PHONES, BRANDS, SERVICES, ACCESSORIES, KEYPAD_PHONES,
+  PhoneItem, KeypadPhone, DEFAULT_PHONE_IMAGE, fmt,
+} from "@/data/products";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -21,6 +24,11 @@ export const Route = createFileRoute("/admin")({
 const ADMIN_PASSWORD = "noon2024";
 
 type Tab = "dashboard" | "phones" | "keypad" | "accessories" | "services";
+
+const BRAND_OPTIONS = [
+  "Apple", "Samsung", "Xiaomi", "Infinix", "Oppo", "Vivo", "Tecno",
+  "Realme", "Honor", "Nokia", "itel", "Jazz", "QMobile", "Other"
+];
 
 function AdminPanel() {
   const [authed, setAuthed] = useState(false);
@@ -74,7 +82,7 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
   const [tab, setTab] = useState<Tab>("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // Maintain in-memory state for phones and keypad phones
+  // Maintain state for phones and keypad phones
   const [phones, setPhones] = useState<PhoneItem[]>(PHONES);
   const [keypadPhones, setKeypadPhones] = useState<KeypadPhone[]>(KEYPAD_PHONES);
 
@@ -198,8 +206,8 @@ function DashboardTab({ phonesCount, keypadCount }: { phonesCount: number; keypa
       <div>
         <h3 className="mb-4 font-display text-lg font-bold">Brand Breakdown (Smartphones)</h3>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-          {["Apple","Samsung","Xiaomi","Infinix","Oppo","Vivo","Tecno","Realme","Honor","Nokia","itel"].map((b) => {
-            const count = PHONES.filter((p) => p.brand === b).length;
+          {["Apple","Samsung","Xiaomi","Infinix","Oppo","Vivo","Tecno","Realme","Honor","Nokia","itel","Other"].map((b) => {
+            const count = PHONES.filter((p) => (p.brand || "Other") === b).length;
             return (
               <div key={b} className="flex items-center justify-between rounded-xl border border-border bg-card px-4 py-3 shadow-sm">
                 <span className="text-sm font-medium">{b}</span>
@@ -230,80 +238,94 @@ function PhonesTab({ phones, setPhones }: { phones: PhoneItem[]; setPhones: Reac
   const [brand, setBrand] = useState("All");
   const [editing, setEditing] = useState<PhoneItem | null>(null);
   const [notice, setNotice] = useState("");
-  const [showAddForm, setShowAddForm] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
 
-  // New phone form state - ALL fields completely optional except phone model/name
+  // New phone form state
   const [newPhone, setNewPhone] = useState<{
     name: string;
     brand: string;
-    description: string;
-    image: string;
+    customBrand: string;
+    price: string;
     ram: string;
     storage: string;
     display: string;
     battery: string;
     chip: string;
     camera: string;
+    image: string;
+    description: string;
   }>({
     name: "",
-    brand: "Samsung",
-    description: "",
-    image: "",
+    brand: "Apple",
+    customBrand: "",
+    price: "",
     ram: "",
     storage: "",
     display: "",
     battery: "",
     chip: "",
     camera: "",
+    image: "",
+    description: "",
   });
 
   const filtered = useMemo(() => {
     return phones.filter((p) => {
-      const ms = brand === "All" || p.brand === brand;
-      const mq = search.trim() === "" || p.name.toLowerCase().includes(search.toLowerCase());
+      const pBrand = p.brand || "Other";
+      const ms = brand === "All" || pBrand === brand;
+      const mq = search.trim() === "" ||
+        p.name.toLowerCase().includes(search.toLowerCase()) ||
+        pBrand.toLowerCase().includes(search.toLowerCase());
       return ms && mq;
     });
   }, [search, brand, phones]);
 
-  const handleAddPhone = () => {
-    // If user entered nothing at all
-    if (!newPhone.name.trim() && !newPhone.description.trim()) {
-      setNotice("⚠️ Kam az kam mobile ka model ya description likhein.");
+  const handleAddPhone = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+
+    if (!newPhone.name.trim()) {
+      setNotice("⚠️ Please enter Phone Name (Model).");
       return;
     }
 
-    const phoneName = newPhone.name.trim() || newPhone.description.trim().slice(0, 30) || "Mobile Phone";
-    const id = "custom_" + Date.now();
+    const selectedBrand = newPhone.brand === "Other" && newPhone.customBrand.trim()
+      ? newPhone.customBrand.trim()
+      : newPhone.brand || "Other";
+
+    const parsedPrice = newPhone.price && Number(newPhone.price) > 0 ? Number(newPhone.price) : undefined;
 
     const phone: PhoneItem = {
-      id,
-      brand: newPhone.brand || "Other",
-      name: phoneName,
-      description: newPhone.description.trim() || undefined,
+      id: "phone_" + Date.now(),
+      name: newPhone.name.trim(),
+      brand: selectedBrand,
+      price: parsedPrice,
       ram: newPhone.ram.trim() || undefined,
       storage: newPhone.storage.trim() || undefined,
       display: newPhone.display.trim() || undefined,
       battery: newPhone.battery.trim() || undefined,
       chip: newPhone.chip.trim() || undefined,
       camera: newPhone.camera.trim() || undefined,
-      image: newPhone.image.trim() || "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&q=80",
+      image: newPhone.image.trim() || DEFAULT_PHONE_IMAGE,
+      description: newPhone.description.trim() || undefined,
     };
 
     setPhones((prev) => [phone, ...prev]);
     setNewPhone({
       name: "",
-      brand: "Samsung",
-      description: "",
-      image: "",
+      brand: "Apple",
+      customBrand: "",
+      price: "",
       ram: "",
       storage: "",
       display: "",
       battery: "",
       chip: "",
       camera: "",
+      image: "",
+      description: "",
     });
-    setShowAddForm(false);
-    setNotice(`✅ "${phone.name}" upload ho gaya!`);
+    setShowAddModal(false);
+    setNotice(`✅ "${phone.name}" successfully added!`);
   };
 
   return (
@@ -311,7 +333,7 @@ function PhonesTab({ phones, setPhones }: { phones: PhoneItem[]; setPhones: Reac
       {notice && (
         <div className={`flex items-center justify-between rounded-xl px-4 py-3 text-sm border ${notice.startsWith("✅") ? "bg-emerald-500/15 border-emerald-500/30 text-emerald-400" : "bg-amber-500/15 border-amber-500/30 text-amber-400"}`}>
           {notice}
-          <button onClick={() => setNotice("")}><X className="h-4 w-4" /></button>
+          <button onClick={() => setNotice("")} className="cursor-pointer"><X className="h-4 w-4" /></button>
         </div>
       )}
 
@@ -331,118 +353,200 @@ function PhonesTab({ phones, setPhones }: { phones: PhoneItem[]; setPhones: Reac
         <div className="flex items-center gap-2">
           <p className="text-xs text-muted-foreground">{filtered.length} smartphones</p>
           <button
-            onClick={() => { setShowAddForm(!showAddForm); setNotice(""); }}
+            onClick={() => { setShowAddModal(true); setNotice(""); }}
             className="inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs font-bold text-primary-foreground shadow transition hover:bg-primary/90 cursor-pointer"
           >
-            {showAddForm ? <X className="h-3.5 w-3.5" /> : <Plus className="h-3.5 w-3.5" />}
-            {showAddForm ? "Cancel" : "Add Smartphone"}
+            <Plus className="h-3.5 w-3.5" />
+            Add New Phone
           </button>
         </div>
       </div>
 
-      {/* Add Phone Form */}
-      {showAddForm && (
-        <div className="rounded-2xl border border-primary/30 bg-card p-5 shadow-md space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="font-display text-base font-bold text-primary">Naya Mobile Add Karein</h3>
-            <span className="text-xs text-emerald-400 font-medium">✓ Har cheez optional hai (sirf model ya description likh dein)</span>
-          </div>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <div className="sm:col-span-2">
-              <label className="mb-1 block text-xs font-semibold text-foreground">Mobile Model / Name</label>
-              <input
-                placeholder="e.g. Samsung Galaxy A05s"
-                value={newPhone.name}
-                onChange={(e) => setNewPhone((p) => ({ ...p, name: e.target.value }))}
-                className="h-10 w-full rounded-lg border border-primary/50 bg-secondary px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
-              />
+      {showAddModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={() => setShowAddModal(false)}>
+          <div className="w-full max-w-lg rounded-3xl border border-border bg-card p-6 shadow-2xl overflow-y-auto max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
+            <div className="mb-5 flex items-center justify-between">
+              <h3 className="font-display text-xl font-bold">Add New Phone</h3>
+              <button onClick={() => setShowAddModal(false)} className="text-muted-foreground hover:text-foreground cursor-pointer">
+                <X className="h-5 w-5" />
+              </button>
             </div>
 
-            <div className="sm:col-span-2">
-              <label className="mb-1 block text-xs font-semibold text-muted-foreground">Description (Optional)</label>
-              <textarea
-                placeholder="Mobile ki koi bhi detail ya condition yahan likh sakte hain..."
-                rows={2}
-                value={newPhone.description}
-                onChange={(e) => setNewPhone((p) => ({ ...p, description: e.target.value }))}
-                className="w-full rounded-lg border border-border bg-secondary p-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
-              />
-            </div>
+            <form onSubmit={handleAddPhone} className="space-y-4">
+              <div>
+                <label className="mb-1 block text-xs font-semibold text-foreground">Name (Model) *</label>
+                <input
+                  type="text"
+                  placeholder="e.g. Nokia 1100, Samsung Galaxy A05s"
+                  value={newPhone.name}
+                  onChange={(e) => setNewPhone((p) => ({ ...p, name: e.target.value }))}
+                  className="h-11 w-full rounded-xl border border-border bg-secondary px-3.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  autoFocus
+                />
+              </div>
 
-            <div>
-              <label className="mb-1 block text-xs font-semibold text-muted-foreground">Brand</label>
-              <input
-                placeholder="e.g. Samsung, Infinix, Vivo..."
-                value={newPhone.brand}
-                onChange={(e) => setNewPhone((p) => ({ ...p, brand: e.target.value }))}
-                className="h-9 w-full rounded-lg border border-border bg-secondary px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
-              />
-            </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="mb-1 block text-xs font-semibold text-muted-foreground">Brand</label>
+                  <select
+                    value={newPhone.brand}
+                    onChange={(e) => setNewPhone((p) => ({ ...p, brand: e.target.value }))}
+                    className="h-11 w-full rounded-xl border border-border bg-secondary px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  >
+                    {BRAND_OPTIONS.map((b) => (
+                      <option key={b} value={b}>{b}</option>
+                    ))}
+                  </select>
+                </div>
 
-            <div>
-              <label className="mb-1 block text-xs font-semibold text-muted-foreground">Photo URL (Optional)</label>
-              <input
-                placeholder="https://... (image link)"
-                value={newPhone.image}
-                onChange={(e) => setNewPhone((p) => ({ ...p, image: e.target.value }))}
-                className="h-9 w-full rounded-lg border border-border bg-secondary px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
-              />
-            </div>
+                <div>
+                  <label className="mb-1 block text-xs font-semibold text-muted-foreground">Price (Rs.) (Optional)</label>
+                  <input
+                    type="number"
+                    placeholder="Optional"
+                    value={newPhone.price}
+                    onChange={(e) => setNewPhone((p) => ({ ...p, price: e.target.value }))}
+                    className="h-11 w-full rounded-xl border border-border bg-secondary px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  />
+                </div>
+              </div>
 
-            <div>
-              <label className="mb-1 block text-xs font-semibold text-muted-foreground">RAM (Optional)</label>
-              <input
-                placeholder="e.g. 4GB, 8GB"
-                value={newPhone.ram}
-                onChange={(e) => setNewPhone((p) => ({ ...p, ram: e.target.value }))}
-                className="h-9 w-full rounded-lg border border-border bg-secondary px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
-              />
-            </div>
+              {newPhone.brand === "Other" && (
+                <div>
+                  <label className="mb-1 block text-xs font-semibold text-muted-foreground">Custom Brand Name (Optional)</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Generic, China Phone, QMobile"
+                    value={newPhone.customBrand}
+                    onChange={(e) => setNewPhone((p) => ({ ...p, customBrand: e.target.value }))}
+                    className="h-10 w-full rounded-xl border border-border bg-secondary px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  />
+                </div>
+              )}
 
-            <div>
-              <label className="mb-1 block text-xs font-semibold text-muted-foreground">Storage (Optional)</label>
-              <input
-                placeholder="e.g. 64GB, 128GB"
-                value={newPhone.storage}
-                onChange={(e) => setNewPhone((p) => ({ ...p, storage: e.target.value }))}
-                className="h-9 w-full rounded-lg border border-border bg-secondary px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
-              />
-            </div>
-          </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="mb-1 block text-xs font-semibold text-muted-foreground">RAM (e.g. 8GB) (Optional)</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. 4GB, 8GB"
+                    value={newPhone.ram}
+                    onChange={(e) => setNewPhone((p) => ({ ...p, ram: e.target.value }))}
+                    className="h-10 w-full rounded-xl border border-border bg-secondary px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block text-xs font-semibold text-muted-foreground">Storage (e.g. 128GB) (Optional)</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. 64GB, 128GB"
+                    value={newPhone.storage}
+                    onChange={(e) => setNewPhone((p) => ({ ...p, storage: e.target.value }))}
+                    className="h-10 w-full rounded-xl border border-border bg-secondary px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  />
+                </div>
+              </div>
 
-          <div className="flex justify-end gap-2 pt-2">
-            <button onClick={() => setShowAddForm(false)} className="rounded-xl border border-border px-5 py-2 text-sm font-medium text-foreground hover:bg-secondary transition cursor-pointer">Cancel</button>
-            <button
-              onClick={handleAddPhone}
-              className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90 cursor-pointer"
-            >
-              <Save className="h-4 w-4" /> Upload Mobile Details
-            </button>
+              <div>
+                <label className="mb-1 block text-xs font-semibold text-muted-foreground">Display (e.g. 6.6&quot; AMOLED) (Optional)</label>
+                <input
+                  type="text"
+                  placeholder="e.g. 6.6&quot; 90Hz, 2.4&quot; QVGA"
+                  value={newPhone.display}
+                  onChange={(e) => setNewPhone((p) => ({ ...p, display: e.target.value }))}
+                  className="h-10 w-full rounded-xl border border-border bg-secondary px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="mb-1 block text-xs font-semibold text-muted-foreground">Battery (Optional)</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. 5000 mAh, 1020 mAh"
+                    value={newPhone.battery}
+                    onChange={(e) => setNewPhone((p) => ({ ...p, battery: e.target.value }))}
+                    className="h-10 w-full rounded-xl border border-border bg-secondary px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block text-xs font-semibold text-muted-foreground">Camera (Optional)</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. 50MP, VGA, None"
+                    value={newPhone.camera}
+                    onChange={(e) => setNewPhone((p) => ({ ...p, camera: e.target.value }))}
+                    className="h-10 w-full rounded-xl border border-border bg-secondary px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="mb-1 block text-xs font-semibold text-muted-foreground">Image URL (Optional)</label>
+                <input
+                  type="url"
+                  placeholder="https://example.com/phone.jpg"
+                  value={newPhone.image}
+                  onChange={(e) => setNewPhone((p) => ({ ...p, image: e.target.value }))}
+                  className="h-10 w-full rounded-xl border border-border bg-secondary px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                />
+                <p className="mt-1 text-[11px] text-muted-foreground">Tip: imgbb.com par image upload karke link copy karein.</p>
+              </div>
+
+              <div>
+                <label className="mb-1 block text-xs font-semibold text-muted-foreground">Description (Optional)</label>
+                <textarea
+                  placeholder="Koi bhi additional detail..."
+                  rows={2}
+                  value={newPhone.description}
+                  onChange={(e) => setNewPhone((p) => ({ ...p, description: e.target.value }))}
+                  className="w-full rounded-xl border border-border bg-secondary p-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                />
+              </div>
+
+              <div className="flex justify-end gap-2 pt-3 border-t border-border">
+                <button
+                  type="button"
+                  onClick={() => setShowAddModal(false)}
+                  className="rounded-xl border border-border px-5 py-2.5 text-sm font-medium text-foreground hover:bg-secondary transition cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="rounded-xl bg-primary px-6 py-2.5 text-sm font-bold text-primary-foreground transition hover:bg-primary/90 cursor-pointer shadow-md"
+                >
+                  Add Phone
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
 
+      {/* Phones Table */}
       <div className="overflow-x-auto rounded-2xl border border-border shadow-sm">
         <table className="min-w-full text-sm">
           <thead>
             <tr className="border-b border-border bg-secondary/50 text-xs text-muted-foreground uppercase tracking-wider">
               <th className="px-4 py-3 text-left">Mobile Model</th>
               <th className="px-4 py-3 text-left hidden sm:table-cell">Brand</th>
-              <th className="px-4 py-3 text-left hidden md:table-cell">Specs / Details</th>
+              <th className="px-4 py-3 text-left hidden md:table-cell">Price</th>
+              <th className="px-4 py-3 text-left hidden lg:table-cell">Specs</th>
               <th className="px-4 py-3 text-right">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
-            {filtered.slice(0, 30).map((p) => (
+            {filtered.slice(0, 40).map((p) => (
               <tr key={p.id} className="bg-card hover:bg-secondary/40 transition-colors">
                 <td className="px-4 py-3 font-medium">
                   <div className="flex items-center gap-3">
                     <img
-                      src={p.image}
+                      src={p.image && p.image.trim() !== "" ? p.image : DEFAULT_PHONE_IMAGE}
                       alt={p.name}
-                      className="h-9 w-9 rounded-lg object-contain bg-secondary p-1 border border-border"
+                      className="h-9 w-9 rounded-lg object-contain bg-secondary p-1 border border-border shrink-0"
                       onError={(e) => {
-                        (e.currentTarget as HTMLImageElement).src = "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=100&q=80";
+                        (e.currentTarget as HTMLImageElement).src = DEFAULT_PHONE_IMAGE;
                       }}
                     />
                     <div>
@@ -451,8 +555,13 @@ function PhonesTab({ phones, setPhones }: { phones: PhoneItem[]; setPhones: Reac
                     </div>
                   </div>
                 </td>
-                <td className="px-4 py-3 text-muted-foreground hidden sm:table-cell">{p.brand}</td>
-                <td className="px-4 py-3 text-muted-foreground hidden md:table-cell">{p.ram || "—"} / {p.storage || "—"}</td>
+                <td className="px-4 py-3 text-muted-foreground hidden sm:table-cell">{p.brand || "Other"}</td>
+                <td className="px-4 py-3 font-medium text-primary hidden md:table-cell">
+                  {p.price ? fmt(p.price) : <span className="text-muted-foreground font-normal">—</span>}
+                </td>
+                <td className="px-4 py-3 text-muted-foreground text-xs hidden lg:table-cell">
+                  {(p.ram || p.storage) ? `${p.ram || ""} ${p.storage || ""}`.trim() : "—"}
+                </td>
                 <td className="px-4 py-3 text-right">
                   <div className="flex justify-end gap-2">
                     <button
@@ -462,7 +571,7 @@ function PhonesTab({ phones, setPhones }: { phones: PhoneItem[]; setPhones: Reac
                       <Edit2 className="h-3.5 w-3.5" />
                     </button>
                     <button
-                      onClick={() => { setPhones((prev) => prev.filter((ph) => ph.id !== p.id)); setNotice(`"${p.name}" delete ho gaya.`); }}
+                      onClick={() => { setPhones((prev) => prev.filter((ph) => ph.id !== p.id)); setNotice(`"${p.name}" deleted.`); }}
                       className="rounded-lg border border-destructive/30 bg-background p-1.5 text-destructive/70 hover:text-destructive hover:bg-destructive/10 transition cursor-pointer"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
@@ -477,59 +586,83 @@ function PhonesTab({ phones, setPhones }: { phones: PhoneItem[]; setPhones: Reac
 
       {/* Edit Modal */}
       {editing && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={() => setEditing(null)}>
-          <div className="w-full max-w-lg rounded-2xl border border-border bg-card p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={() => setEditing(null)}>
+          <div className="w-full max-w-lg rounded-3xl border border-border bg-card p-6 shadow-2xl overflow-y-auto max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
             <div className="mb-4 flex items-center justify-between">
-              <h3 className="font-display text-lg font-bold">Edit Mobile</h3>
-              <button onClick={() => setEditing(null)} className="cursor-pointer"><X className="h-5 w-5 text-muted-foreground" /></button>
+              <h3 className="font-display text-lg font-bold">Edit Phone</h3>
+              <button onClick={() => setEditing(null)} className="cursor-pointer text-muted-foreground hover:text-foreground"><X className="h-5 w-5" /></button>
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="col-span-2">
-                <label className="mb-1 block text-xs font-semibold text-muted-foreground">Mobile Model / Name</label>
+            <div className="space-y-3">
+              <div>
+                <label className="mb-1 block text-xs font-semibold text-foreground">Name (Model)</label>
                 <input
                   defaultValue={editing.name}
                   id="edit_name"
-                  className="h-9 w-full rounded-lg border border-border bg-secondary px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  className="h-10 w-full rounded-xl border border-border bg-secondary px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
                 />
               </div>
-              <div className="col-span-2">
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="mb-1 block text-xs font-semibold text-muted-foreground">Brand</label>
+                  <input
+                    defaultValue={editing.brand || "Other"}
+                    id="edit_brand"
+                    className="h-10 w-full rounded-xl border border-border bg-secondary px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block text-xs font-semibold text-muted-foreground">Price (Rs.) (Optional)</label>
+                  <input
+                    type="number"
+                    defaultValue={editing.price !== undefined ? String(editing.price) : ""}
+                    id="edit_price"
+                    className="h-10 w-full rounded-xl border border-border bg-secondary px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="mb-1 block text-xs font-semibold text-muted-foreground">Image URL (Optional)</label>
+                <input
+                  defaultValue={editing.image || ""}
+                  id="edit_image"
+                  className="h-10 w-full rounded-xl border border-border bg-secondary px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                />
+              </div>
+
+              <div>
                 <label className="mb-1 block text-xs font-semibold text-muted-foreground">Description (Optional)</label>
                 <textarea
                   defaultValue={editing.description || ""}
                   id="edit_description"
                   rows={2}
-                  className="w-full rounded-lg border border-border bg-secondary p-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
-                />
-              </div>
-              <div>
-                <label className="mb-1 block text-xs font-semibold text-muted-foreground">Brand</label>
-                <input
-                  defaultValue={editing.brand}
-                  id="edit_brand"
-                  className="h-9 w-full rounded-lg border border-border bg-secondary px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
-                />
-              </div>
-              <div>
-                <label className="mb-1 block text-xs font-semibold text-muted-foreground">Image URL</label>
-                <input
-                  defaultValue={editing.image}
-                  id="edit_image"
-                  className="h-9 w-full rounded-lg border border-border bg-secondary px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  className="w-full rounded-xl border border-border bg-secondary p-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
                 />
               </div>
             </div>
-            <div className="mt-5 flex justify-end gap-2">
+
+            <div className="mt-5 flex justify-end gap-2 pt-3 border-t border-border">
               <button onClick={() => setEditing(null)} className="rounded-xl border border-border px-5 py-2 text-sm font-medium text-foreground hover:bg-secondary transition cursor-pointer">Cancel</button>
               <button
                 onClick={() => {
                   const newName = (document.getElementById("edit_name") as HTMLInputElement)?.value || editing.name;
-                  const newDesc = (document.getElementById("edit_description") as HTMLTextAreaElement)?.value || "";
-                  const newBrand = (document.getElementById("edit_brand") as HTMLInputElement)?.value || editing.brand;
-                  const newImg = (document.getElementById("edit_image") as HTMLInputElement)?.value || editing.image;
+                  const newBrand = (document.getElementById("edit_brand") as HTMLInputElement)?.value || "Other";
+                  const priceStr = (document.getElementById("edit_price") as HTMLInputElement)?.value;
+                  const newPrice = priceStr && Number(priceStr) > 0 ? Number(priceStr) : undefined;
+                  const newImg = (document.getElementById("edit_image") as HTMLInputElement)?.value;
+                  const newDesc = (document.getElementById("edit_description") as HTMLTextAreaElement)?.value;
 
-                  setPhones((prev) => prev.map((ph) => ph.id === editing.id ? { ...ph, name: newName, description: newDesc, brand: newBrand, image: newImg } : ph));
+                  setPhones((prev) => prev.map((ph) => ph.id === editing.id ? {
+                    ...ph,
+                    name: newName,
+                    brand: newBrand,
+                    price: newPrice,
+                    image: newImg || DEFAULT_PHONE_IMAGE,
+                    description: newDesc || undefined,
+                  } : ph));
                   setEditing(null);
-                  setNotice(`✅ "${newName}" update ho gaya!`);
+                  setNotice(`✅ "${newName}" updated successfully!`);
                 }}
                 className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90 cursor-pointer"
               >
@@ -546,32 +679,52 @@ function PhonesTab({ phones, setPhones }: { phones: PhoneItem[]; setPhones: Reac
 function KeypadTab({ keypadPhones, setKeypadPhones }: { keypadPhones: KeypadPhone[]; setKeypadPhones: React.Dispatch<React.SetStateAction<KeypadPhone[]>> }) {
   const [search, setSearch] = useState("");
   const [notice, setNotice] = useState("");
-  const [showAddForm, setShowAddForm] = useState(false);
-  const [newKeypad, setNewKeypad] = useState({ name: "", brand: "Nokia", description: "", image: "" });
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newKeypad, setNewKeypad] = useState({
+    name: "",
+    brand: "Nokia",
+    customBrand: "",
+    price: "",
+    description: "",
+    image: ""
+  });
 
   const filtered = useMemo(() => {
     return keypadPhones.filter((k) => {
-      return search.trim() === "" || k.name.toLowerCase().includes(search.toLowerCase()) || k.brand.toLowerCase().includes(search.toLowerCase());
+      const kBrand = k.brand || "Other";
+      return search.trim() === "" ||
+        k.name.toLowerCase().includes(search.toLowerCase()) ||
+        kBrand.toLowerCase().includes(search.toLowerCase());
     });
   }, [search, keypadPhones]);
 
-  const handleAddKeypad = () => {
-    if (!newKeypad.name.trim() && !newKeypad.description.trim()) {
-      setNotice("⚠️ Kam az kam Keypad Phone ka naam ya description likhein.");
+  const handleAddKeypad = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+
+    if (!newKeypad.name.trim()) {
+      setNotice("⚠️ Please enter Phone Name (Model).");
       return;
     }
-    const name = newKeypad.name.trim() || newKeypad.description.trim().slice(0, 25) || "Keypad Phone";
+
+    const selectedBrand = newKeypad.brand === "Other" && newKeypad.customBrand.trim()
+      ? newKeypad.customBrand.trim()
+      : newKeypad.brand || "Other";
+
+    const parsedPrice = newKeypad.price && Number(newKeypad.price) > 0 ? Number(newKeypad.price) : undefined;
+
     const newPhone: KeypadPhone = {
       id: "kp_" + Date.now(),
-      name,
-      brand: newKeypad.brand.trim() || "Nokia",
+      name: newKeypad.name.trim(),
+      brand: selectedBrand,
+      price: parsedPrice,
       description: newKeypad.description.trim() || undefined,
-      image: newKeypad.image.trim() || "https://images.unsplash.com/photo-1580910051074-3eb694886505?w=400&q=80",
+      image: newKeypad.image.trim() || DEFAULT_PHONE_IMAGE,
     };
+
     setKeypadPhones((prev) => [newPhone, ...prev]);
-    setNewKeypad({ name: "", brand: "Nokia", description: "", image: "" });
-    setShowAddForm(false);
-    setNotice(`✅ Keypad Phone "${name}" add ho gaya!`);
+    setNewKeypad({ name: "", brand: "Nokia", customBrand: "", price: "", description: "", image: "" });
+    setShowAddModal(false);
+    setNotice(`✅ Keypad Phone "${newPhone.name}" added successfully!`);
   };
 
   return (
@@ -579,7 +732,7 @@ function KeypadTab({ keypadPhones, setKeypadPhones }: { keypadPhones: KeypadPhon
       {notice && (
         <div className={`flex items-center justify-between rounded-xl px-4 py-3 text-sm border ${notice.startsWith("✅") ? "bg-emerald-500/15 border-emerald-500/30 text-emerald-400" : "bg-amber-500/15 border-amber-500/30 text-amber-400"}`}>
           {notice}
-          <button onClick={() => setNotice("")}><X className="h-4 w-4" /></button>
+          <button onClick={() => setNotice("")} className="cursor-pointer"><X className="h-4 w-4" /></button>
         </div>
       )}
 
@@ -596,79 +749,124 @@ function KeypadTab({ keypadPhones, setKeypadPhones }: { keypadPhones: KeypadPhon
         <div className="flex items-center gap-2">
           <p className="text-xs text-muted-foreground">{filtered.length} keypad phones</p>
           <button
-            onClick={() => { setShowAddForm(!showAddForm); setNotice(""); }}
+            onClick={() => { setShowAddModal(true); setNotice(""); }}
             className="inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs font-bold text-primary-foreground shadow transition hover:bg-primary/90 cursor-pointer"
           >
-            {showAddForm ? <X className="h-3.5 w-3.5" /> : <Plus className="h-3.5 w-3.5" />}
-            {showAddForm ? "Cancel" : "Add Keypad Phone"}
+            <Plus className="h-3.5 w-3.5" />
+            Add Keypad Phone
           </button>
         </div>
       </div>
 
-      {/* Add Keypad Form */}
-      {showAddForm && (
-        <div className="rounded-2xl border border-primary/30 bg-card p-5 shadow-md space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="font-display text-base font-bold text-primary">Naya Keypad (Button) Phone Add Karein</h3>
-            <span className="text-xs text-emerald-400 font-medium">✓ Jo bhi detail likhein ge upload ho jaye gi</span>
-          </div>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <div className="sm:col-span-2">
-              <label className="mb-1 block text-xs font-semibold text-foreground">Phone Model / Name</label>
-              <input
-                placeholder="e.g. Nokia 105 (2024), Samsung Guru Music"
-                value={newKeypad.name}
-                onChange={(e) => setNewKeypad((p) => ({ ...p, name: e.target.value }))}
-                className="h-10 w-full rounded-lg border border-primary/50 bg-secondary px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
-              />
+      {showAddModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={() => setShowAddModal(false)}>
+          <div className="w-full max-w-lg rounded-3xl border border-border bg-card p-6 shadow-2xl overflow-y-auto max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="font-display text-xl font-bold">Add Keypad (Button) Phone</h3>
+              <button onClick={() => setShowAddModal(false)} className="text-muted-foreground hover:text-foreground cursor-pointer"><X className="h-5 w-5" /></button>
             </div>
-            <div>
-              <label className="mb-1 block text-xs font-semibold text-muted-foreground">Brand (Nokia, Samsung, itel, Jazz, QMobile...)</label>
-              <input
-                placeholder="e.g. Nokia"
-                value={newKeypad.brand}
-                onChange={(e) => setNewKeypad((p) => ({ ...p, brand: e.target.value }))}
-                className="h-9 w-full rounded-lg border border-border bg-secondary px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
-              />
-            </div>
-            <div>
-              <label className="mb-1 block text-xs font-semibold text-muted-foreground">Photo URL (Optional)</label>
-              <input
-                placeholder="https://... (image link)"
-                value={newKeypad.image}
-                onChange={(e) => setNewKeypad((p) => ({ ...p, image: e.target.value }))}
-                className="h-9 w-full rounded-lg border border-border bg-secondary px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
-              />
-            </div>
-            <div className="sm:col-span-2">
-              <label className="mb-1 block text-xs font-semibold text-muted-foreground">Description / Details (Optional)</label>
-              <textarea
-                placeholder="Dual SIM, PTA Approved, Battery backup waghaira..."
-                rows={2}
-                value={newKeypad.description}
-                onChange={(e) => setNewKeypad((p) => ({ ...p, description: e.target.value }))}
-                className="w-full rounded-lg border border-border bg-secondary p-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
-              />
-            </div>
-          </div>
-          <div className="flex justify-end gap-2 pt-2">
-            <button onClick={() => setShowAddForm(false)} className="rounded-xl border border-border px-5 py-2 text-sm font-medium text-foreground hover:bg-secondary transition cursor-pointer">Cancel</button>
-            <button
-              onClick={handleAddKeypad}
-              className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90 cursor-pointer"
-            >
-              <Save className="h-4 w-4" /> Upload Keypad Phone
-            </button>
+
+            <form onSubmit={handleAddKeypad} className="space-y-4">
+              <div>
+                <label className="mb-1 block text-xs font-semibold text-foreground">Phone Model / Name *</label>
+                <input
+                  type="text"
+                  placeholder="e.g. Nokia 105 (2024), Samsung Guru Music"
+                  value={newKeypad.name}
+                  onChange={(e) => setNewKeypad((p) => ({ ...p, name: e.target.value }))}
+                  className="h-11 w-full rounded-xl border border-border bg-secondary px-3.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  autoFocus
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="mb-1 block text-xs font-semibold text-muted-foreground">Brand</label>
+                  <select
+                    value={newKeypad.brand}
+                    onChange={(e) => setNewKeypad((p) => ({ ...p, brand: e.target.value }))}
+                    className="h-11 w-full rounded-xl border border-border bg-secondary px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  >
+                    {BRAND_OPTIONS.map((b) => (
+                      <option key={b} value={b}>{b}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="mb-1 block text-xs font-semibold text-muted-foreground">Price (Rs.) (Optional)</label>
+                  <input
+                    type="number"
+                    placeholder="Optional"
+                    value={newKeypad.price}
+                    onChange={(e) => setNewKeypad((p) => ({ ...p, price: e.target.value }))}
+                    className="h-11 w-full rounded-xl border border-border bg-secondary px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  />
+                </div>
+              </div>
+
+              {newKeypad.brand === "Other" && (
+                <div>
+                  <label className="mb-1 block text-xs font-semibold text-muted-foreground">Custom Brand (Optional)</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. QMobile, GFive, Voice"
+                    value={newKeypad.customBrand}
+                    onChange={(e) => setNewKeypad((p) => ({ ...p, customBrand: e.target.value }))}
+                    className="h-10 w-full rounded-xl border border-border bg-secondary px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  />
+                </div>
+              )}
+
+              <div>
+                <label className="mb-1 block text-xs font-semibold text-muted-foreground">Image URL (Optional)</label>
+                <input
+                  type="url"
+                  placeholder="https://... (image link or leave empty)"
+                  value={newKeypad.image}
+                  onChange={(e) => setNewKeypad((p) => ({ ...p, image: e.target.value }))}
+                  className="h-10 w-full rounded-xl border border-border bg-secondary px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                />
+              </div>
+
+              <div>
+                <label className="mb-1 block text-xs font-semibold text-muted-foreground">Description / Features (Optional)</label>
+                <textarea
+                  placeholder="Dual SIM, PTA Approved, Torch, Battery backup..."
+                  rows={2}
+                  value={newKeypad.description}
+                  onChange={(e) => setNewKeypad((p) => ({ ...p, description: e.target.value }))}
+                  className="w-full rounded-xl border border-border bg-secondary p-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                />
+              </div>
+
+              <div className="flex justify-end gap-2 pt-3 border-t border-border">
+                <button
+                  type="button"
+                  onClick={() => setShowAddModal(false)}
+                  className="rounded-xl border border-border px-5 py-2 text-sm font-medium text-foreground hover:bg-secondary transition cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="rounded-xl bg-primary px-6 py-2 text-sm font-bold text-primary-foreground transition hover:bg-primary/90 cursor-pointer shadow-md"
+                >
+                  Add Keypad Phone
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
 
+      {/* Keypad Table */}
       <div className="overflow-x-auto rounded-2xl border border-border shadow-sm">
         <table className="min-w-full text-sm">
           <thead>
             <tr className="border-b border-border bg-secondary/50 text-xs text-muted-foreground uppercase tracking-wider">
               <th className="px-4 py-3 text-left">Keypad Model</th>
               <th className="px-4 py-3 text-left">Brand</th>
+              <th className="px-4 py-3 text-left">Price</th>
               <th className="px-4 py-3 text-right">Actions</th>
             </tr>
           </thead>
@@ -678,25 +876,28 @@ function KeypadTab({ keypadPhones, setKeypadPhones }: { keypadPhones: KeypadPhon
                 <td className="px-4 py-3 font-medium">
                   <div className="flex items-center gap-3">
                     <img
-                      src={kp.image}
+                      src={kp.image && kp.image.trim() !== "" ? kp.image : DEFAULT_PHONE_IMAGE}
                       alt={kp.name}
-                      className="h-9 w-9 rounded-lg object-contain bg-secondary p-1 border border-border"
+                      className="h-9 w-9 rounded-lg object-contain bg-secondary p-1 border border-border shrink-0"
                       onError={(e) => {
-                        (e.currentTarget as HTMLImageElement).src = "https://images.unsplash.com/photo-1580910051074-3eb694886505?w=100&q=80";
+                        (e.currentTarget as HTMLImageElement).src = DEFAULT_PHONE_IMAGE;
                       }}
                     />
                     <div>
                       <p className="font-bold text-foreground">{kp.name}</p>
-                      {kp.description && <p className="text-xs text-muted-foreground">{kp.description}</p>}
+                      {kp.description && <p className="text-xs text-muted-foreground line-clamp-1">{kp.description}</p>}
                     </div>
                   </div>
                 </td>
-                <td className="px-4 py-3 text-muted-foreground">{kp.brand}</td>
+                <td className="px-4 py-3 text-muted-foreground">{kp.brand || "Other"}</td>
+                <td className="px-4 py-3 font-medium text-primary">
+                  {kp.price ? fmt(kp.price) : <span className="text-muted-foreground font-normal">—</span>}
+                </td>
                 <td className="px-4 py-3 text-right">
                   <button
                     onClick={() => {
                       setKeypadPhones((prev) => prev.filter((k) => k.id !== kp.id));
-                      setNotice(`"${kp.name}" delete ho gaya.`);
+                      setNotice(`"${kp.name}" deleted.`);
                     }}
                     className="rounded-lg border border-destructive/30 bg-background p-1.5 text-destructive/70 hover:text-destructive hover:bg-destructive/10 transition cursor-pointer"
                   >

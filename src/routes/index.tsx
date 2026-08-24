@@ -166,31 +166,44 @@ function Home() {
           </div>
 
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
-            {KEYPAD_PHONES.map((kp) => (
-              <a
-                key={kp.id}
-                href={WHATSAPP(`Assalam o Alaikum, mujhe ${kp.name} ke baare mein puchna tha. Kya yeh available hai?`)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group flex flex-col items-center overflow-hidden rounded-2xl border border-border bg-card p-4 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-xl text-center"
-              >
-                <div className="relative flex h-36 w-full items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-secondary/60 to-background mb-3">
-                  <div className="absolute inset-0 bg-primary/5 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                  <img
-                    src={kp.image}
-                    alt={kp.name}
-                    loading="lazy"
-                    className="max-h-full max-w-full object-contain drop-shadow-md transition-transform duration-500 group-hover:scale-110"
-                    onError={(e) => {
-                      (e.currentTarget as HTMLImageElement).src = "https://placehold.co/150x200?text=Phone";
-                    }}
-                  />
-                </div>
-                <span className="text-[10px] font-semibold uppercase tracking-widest text-accent">{kp.brand}</span>
-                <h3 className="mt-1 text-sm font-bold leading-tight group-hover:text-primary transition-colors">{kp.name}</h3>
-                <span className="mt-2 text-[10px] text-primary font-semibold">Tap to Inquire</span>
-              </a>
-            ))}
+            {KEYPAD_PHONES.map((kp) => {
+              const kpImg = kp.image && kp.image.trim() !== "" ? kp.image : "https://images.unsplash.com/photo-1580910051074-3eb694886505?w=400&q=80";
+              const hasKpPrice = typeof kp.price === "number" && kp.price > 0;
+              const kpMsg = hasKpPrice
+                ? `Assalam o Alaikum, mujhe ${kp.name} (Rs. ${kp.price.toLocaleString("en-PK")}) ke baare mein puchna tha.`
+                : `Assalam o Alaikum, mujhe ${kp.name} ke baare mein puchna tha. Kya yeh available hai?`;
+
+              return (
+                <a
+                  key={kp.id}
+                  href={WHATSAPP(kpMsg)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group flex flex-col items-center overflow-hidden rounded-2xl border border-border bg-card p-4 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-xl text-center"
+                >
+                  <div className="relative flex h-36 w-full items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-secondary/60 to-background mb-3">
+                    <div className="absolute inset-0 bg-primary/5 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                    <img
+                      src={kpImg}
+                      alt={kp.name}
+                      loading="lazy"
+                      className="max-h-full max-w-full object-contain drop-shadow-md transition-transform duration-500 group-hover:scale-110"
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).src = "https://images.unsplash.com/photo-1580910051074-3eb694886505?w=400&q=80";
+                      }}
+                    />
+                  </div>
+                  {kp.brand && (
+                    <span className="text-[10px] font-semibold uppercase tracking-widest text-accent">{kp.brand}</span>
+                  )}
+                  <h3 className="mt-1 text-sm font-bold leading-tight group-hover:text-primary transition-colors">{kp.name}</h3>
+                  {hasKpPrice && (
+                    <span className="mt-1 text-xs font-bold text-primary">Rs. {kp.price?.toLocaleString("en-PK")}</span>
+                  )}
+                  <span className="mt-2 text-[10px] text-primary font-semibold">Tap to Inquire</span>
+                </a>
+              );
+            })}
           </div>
         </div>
       </section>
