@@ -2,10 +2,10 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
 import {
   LayoutDashboard, Wrench, ShoppingBag, LogOut,
-  Phone, TrendingUp, Eye, Edit2, Trash2, Search, X, Save, ChevronDown,
+  Smartphone, Phone, Eye, Edit2, Trash2, Search, X, Save, ChevronDown, Plus,
 } from "lucide-react";
 import logo from "@/assets/logo.png";
-import { PHONES, BRANDS, SERVICES, ACCESSORIES, PhoneItem, fmt } from "@/data/products";
+import { PHONES, BRANDS, SERVICES, ACCESSORIES, KEYPAD_PHONES, PhoneItem, KeypadPhone } from "@/data/products";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -17,10 +17,10 @@ export const Route = createFileRoute("/admin")({
   component: AdminPanel,
 });
 
-// Simple mock auth — in production replace with real Firebase Auth
+// Simple mock auth
 const ADMIN_PASSWORD = "noon2024";
 
-type Tab = "dashboard" | "phones" | "accessories" | "services";
+type Tab = "dashboard" | "phones" | "keypad" | "accessories" | "services";
 
 function AdminPanel() {
   const [authed, setAuthed] = useState(false);
@@ -56,7 +56,7 @@ function AdminPanel() {
                 if (pw === ADMIN_PASSWORD) { setAuthed(true); setError(""); }
                 else setError("Wrong password. Try again.");
               }}
-              className="h-11 rounded-xl bg-primary text-sm font-bold text-primary-foreground transition hover:bg-primary/90"
+              className="h-11 rounded-xl bg-primary text-sm font-bold text-primary-foreground transition hover:bg-primary/90 cursor-pointer"
             >
               Login
             </button>
@@ -74,9 +74,14 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
   const [tab, setTab] = useState<Tab>("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  // Maintain in-memory state for phones and keypad phones
+  const [phones, setPhones] = useState<PhoneItem[]>(PHONES);
+  const [keypadPhones, setKeypadPhones] = useState<KeypadPhone[]>(KEYPAD_PHONES);
+
   const navItems: { id: Tab; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { id: "phones", label: "Phones", icon: Phone },
+    { id: "phones", label: "Smartphones", icon: Smartphone },
+    { id: "keypad", label: "Keypad Phones", icon: Phone },
     { id: "accessories", label: "Accessories", icon: ShoppingBag },
     { id: "services", label: "Services", icon: Wrench },
   ];
@@ -102,7 +107,7 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
             <button
               key={item.id}
               onClick={() => { setTab(item.id); setSidebarOpen(false); }}
-              className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition mb-1 ${tab === item.id ? "bg-primary text-primary-foreground shadow" : "text-muted-foreground hover:bg-secondary hover:text-foreground"}`}
+              className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition mb-1 cursor-pointer ${tab === item.id ? "bg-primary text-primary-foreground shadow" : "text-muted-foreground hover:bg-secondary hover:text-foreground"}`}
             >
               <item.icon className="h-4 w-4" />
               {item.label}
@@ -119,7 +124,7 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
           </Link>
           <button
             onClick={onLogout}
-            className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-destructive hover:bg-destructive/10 transition"
+            className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-destructive hover:bg-destructive/10 transition cursor-pointer"
           >
             <LogOut className="h-4 w-4" /> Logout
           </button>
@@ -139,15 +144,18 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
             <button onClick={() => setSidebarOpen(true)} className="rounded-lg border border-border p-1.5 text-muted-foreground hover:bg-secondary lg:hidden">
               <LayoutDashboard className="h-4 w-4" />
             </button>
-            <h2 className="font-display text-base font-bold capitalize">{tab}</h2>
+            <h2 className="font-display text-base font-bold capitalize">
+              {tab === "phones" ? "Smartphones" : tab === "keypad" ? "Keypad (Button) Phones" : tab}
+            </h2>
           </div>
           <span className="hidden text-xs text-muted-foreground sm:block">Noon Mobile Admin</span>
         </header>
 
         {/* Content */}
         <main className="flex-1 overflow-y-auto p-4 sm:p-6">
-          {tab === "dashboard" && <DashboardTab />}
-          {tab === "phones" && <PhonesTab />}
+          {tab === "dashboard" && <DashboardTab phonesCount={phones.length} keypadCount={keypadPhones.length} />}
+          {tab === "phones" && <PhonesTab phones={phones} setPhones={setPhones} />}
+          {tab === "keypad" && <KeypadTab keypadPhones={keypadPhones} setKeypadPhones={setKeypadPhones} />}
           {tab === "accessories" && <AccessoriesTab />}
           {tab === "services" && <ServicesTab />}
         </main>
@@ -171,26 +179,24 @@ function StatCard({ title, value, sub, icon: Icon, color }: { title: string; val
   );
 }
 
-function DashboardTab() {
-  const totalPhones = PHONES.length;
+function DashboardTab({ phonesCount, keypadCount }: { phonesCount: number; keypadCount: number }) {
   const totalAcc = ACCESSORIES.length;
   const totalServices = SERVICES.length;
-  const avgPrice = Math.round(PHONES.reduce((s, p) => s + p.price, 0) / PHONES.length);
 
   return (
     <div className="space-y-8">
       <div>
         <h3 className="mb-4 font-display text-lg font-bold">Overview</h3>
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-          <StatCard title="Total Phones" value={totalPhones} sub="In inventory" icon={Phone} color="bg-blue-500/15 text-blue-400" />
-          <StatCard title="Accessories" value={totalAcc} sub="Categories available" icon={ShoppingBag} color="bg-purple-500/15 text-purple-400" />
+          <StatCard title="Smartphones" value={phonesCount} sub="In inventory" icon={Smartphone} color="bg-blue-500/15 text-blue-400" />
+          <StatCard title="Keypad Phones" value={keypadCount} sub="Button phones" icon={Phone} color="bg-amber-500/15 text-amber-400" />
+          <StatCard title="Accessories" value={totalAcc} sub="Categories" icon={ShoppingBag} color="bg-purple-500/15 text-purple-400" />
           <StatCard title="Services" value={totalServices} sub="Repair types" icon={Wrench} color="bg-emerald-500/15 text-emerald-400" />
-          <StatCard title="Avg. Price" value={fmt(avgPrice)} sub="Across all phones" icon={TrendingUp} color="bg-amber-500/15 text-amber-400" />
         </div>
       </div>
 
       <div>
-        <h3 className="mb-4 font-display text-lg font-bold">Brand Breakdown</h3>
+        <h3 className="mb-4 font-display text-lg font-bold">Brand Breakdown (Smartphones)</h3>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
           {["Apple","Samsung","Xiaomi","Infinix","Oppo","Vivo","Tecno","Realme","Honor","Nokia","itel"].map((b) => {
             const count = PHONES.filter((p) => p.brand === b).length;
@@ -219,24 +225,91 @@ function DashboardTab() {
   );
 }
 
-function PhonesTab() {
+function PhonesTab({ phones, setPhones }: { phones: PhoneItem[]; setPhones: React.Dispatch<React.SetStateAction<PhoneItem[]>> }) {
   const [search, setSearch] = useState("");
   const [brand, setBrand] = useState("All");
   const [editing, setEditing] = useState<PhoneItem | null>(null);
   const [notice, setNotice] = useState("");
+  const [showAddForm, setShowAddForm] = useState(false);
+
+  // New phone form state - ALL fields completely optional except phone model/name
+  const [newPhone, setNewPhone] = useState<{
+    name: string;
+    brand: string;
+    description: string;
+    image: string;
+    ram: string;
+    storage: string;
+    display: string;
+    battery: string;
+    chip: string;
+    camera: string;
+  }>({
+    name: "",
+    brand: "Samsung",
+    description: "",
+    image: "",
+    ram: "",
+    storage: "",
+    display: "",
+    battery: "",
+    chip: "",
+    camera: "",
+  });
 
   const filtered = useMemo(() => {
-    return PHONES.filter((p) => {
+    return phones.filter((p) => {
       const ms = brand === "All" || p.brand === brand;
       const mq = search.trim() === "" || p.name.toLowerCase().includes(search.toLowerCase());
       return ms && mq;
     });
-  }, [search, brand]);
+  }, [search, brand, phones]);
+
+  const handleAddPhone = () => {
+    // If user entered nothing at all
+    if (!newPhone.name.trim() && !newPhone.description.trim()) {
+      setNotice("⚠️ Kam az kam mobile ka model ya description likhein.");
+      return;
+    }
+
+    const phoneName = newPhone.name.trim() || newPhone.description.trim().slice(0, 30) || "Mobile Phone";
+    const id = "custom_" + Date.now();
+
+    const phone: PhoneItem = {
+      id,
+      brand: newPhone.brand || "Other",
+      name: phoneName,
+      description: newPhone.description.trim() || undefined,
+      ram: newPhone.ram.trim() || undefined,
+      storage: newPhone.storage.trim() || undefined,
+      display: newPhone.display.trim() || undefined,
+      battery: newPhone.battery.trim() || undefined,
+      chip: newPhone.chip.trim() || undefined,
+      camera: newPhone.camera.trim() || undefined,
+      image: newPhone.image.trim() || "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&q=80",
+    };
+
+    setPhones((prev) => [phone, ...prev]);
+    setNewPhone({
+      name: "",
+      brand: "Samsung",
+      description: "",
+      image: "",
+      ram: "",
+      storage: "",
+      display: "",
+      battery: "",
+      chip: "",
+      camera: "",
+    });
+    setShowAddForm(false);
+    setNotice(`✅ "${phone.name}" upload ho gaya!`);
+  };
 
   return (
     <div className="space-y-5">
       {notice && (
-        <div className="flex items-center justify-between rounded-xl bg-emerald-500/15 border border-emerald-500/30 px-4 py-3 text-sm text-emerald-400">
+        <div className={`flex items-center justify-between rounded-xl px-4 py-3 text-sm border ${notice.startsWith("✅") ? "bg-emerald-500/15 border-emerald-500/30 text-emerald-400" : "bg-amber-500/15 border-amber-500/30 text-amber-400"}`}>
           {notice}
           <button onClick={() => setNotice("")}><X className="h-4 w-4" /></button>
         </div>
@@ -246,7 +319,7 @@ function PhonesTab() {
         <div className="flex flex-wrap gap-2">
           <div className="relative">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
-            <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search…" className="h-9 rounded-full border border-border bg-secondary pl-9 pr-4 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50" />
+            <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search smartphones…" className="h-9 rounded-full border border-border bg-secondary pl-9 pr-4 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50" />
           </div>
           <div className="relative">
             <select value={brand} onChange={(e) => setBrand(e.target.value)} className="h-9 appearance-none rounded-full border border-border bg-secondary pl-3 pr-8 text-xs text-foreground focus:outline-none">
@@ -255,38 +328,142 @@ function PhonesTab() {
             <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 h-3 w-3 -translate-y-1/2 text-muted-foreground" />
           </div>
         </div>
-        <p className="text-xs text-muted-foreground">{filtered.length} phones • <em>Note: This is a read-only view. Connect Firebase to enable real edits.</em></p>
+        <div className="flex items-center gap-2">
+          <p className="text-xs text-muted-foreground">{filtered.length} smartphones</p>
+          <button
+            onClick={() => { setShowAddForm(!showAddForm); setNotice(""); }}
+            className="inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs font-bold text-primary-foreground shadow transition hover:bg-primary/90 cursor-pointer"
+          >
+            {showAddForm ? <X className="h-3.5 w-3.5" /> : <Plus className="h-3.5 w-3.5" />}
+            {showAddForm ? "Cancel" : "Add Smartphone"}
+          </button>
+        </div>
       </div>
+
+      {/* Add Phone Form */}
+      {showAddForm && (
+        <div className="rounded-2xl border border-primary/30 bg-card p-5 shadow-md space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="font-display text-base font-bold text-primary">Naya Mobile Add Karein</h3>
+            <span className="text-xs text-emerald-400 font-medium">✓ Har cheez optional hai (sirf model ya description likh dein)</span>
+          </div>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div className="sm:col-span-2">
+              <label className="mb-1 block text-xs font-semibold text-foreground">Mobile Model / Name</label>
+              <input
+                placeholder="e.g. Samsung Galaxy A05s"
+                value={newPhone.name}
+                onChange={(e) => setNewPhone((p) => ({ ...p, name: e.target.value }))}
+                className="h-10 w-full rounded-lg border border-primary/50 bg-secondary px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+              />
+            </div>
+
+            <div className="sm:col-span-2">
+              <label className="mb-1 block text-xs font-semibold text-muted-foreground">Description (Optional)</label>
+              <textarea
+                placeholder="Mobile ki koi bhi detail ya condition yahan likh sakte hain..."
+                rows={2}
+                value={newPhone.description}
+                onChange={(e) => setNewPhone((p) => ({ ...p, description: e.target.value }))}
+                className="w-full rounded-lg border border-border bg-secondary p-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+              />
+            </div>
+
+            <div>
+              <label className="mb-1 block text-xs font-semibold text-muted-foreground">Brand</label>
+              <input
+                placeholder="e.g. Samsung, Infinix, Vivo..."
+                value={newPhone.brand}
+                onChange={(e) => setNewPhone((p) => ({ ...p, brand: e.target.value }))}
+                className="h-9 w-full rounded-lg border border-border bg-secondary px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+              />
+            </div>
+
+            <div>
+              <label className="mb-1 block text-xs font-semibold text-muted-foreground">Photo URL (Optional)</label>
+              <input
+                placeholder="https://... (image link)"
+                value={newPhone.image}
+                onChange={(e) => setNewPhone((p) => ({ ...p, image: e.target.value }))}
+                className="h-9 w-full rounded-lg border border-border bg-secondary px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+              />
+            </div>
+
+            <div>
+              <label className="mb-1 block text-xs font-semibold text-muted-foreground">RAM (Optional)</label>
+              <input
+                placeholder="e.g. 4GB, 8GB"
+                value={newPhone.ram}
+                onChange={(e) => setNewPhone((p) => ({ ...p, ram: e.target.value }))}
+                className="h-9 w-full rounded-lg border border-border bg-secondary px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+              />
+            </div>
+
+            <div>
+              <label className="mb-1 block text-xs font-semibold text-muted-foreground">Storage (Optional)</label>
+              <input
+                placeholder="e.g. 64GB, 128GB"
+                value={newPhone.storage}
+                onChange={(e) => setNewPhone((p) => ({ ...p, storage: e.target.value }))}
+                className="h-9 w-full rounded-lg border border-border bg-secondary px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+              />
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-2 pt-2">
+            <button onClick={() => setShowAddForm(false)} className="rounded-xl border border-border px-5 py-2 text-sm font-medium text-foreground hover:bg-secondary transition cursor-pointer">Cancel</button>
+            <button
+              onClick={handleAddPhone}
+              className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90 cursor-pointer"
+            >
+              <Save className="h-4 w-4" /> Upload Mobile Details
+            </button>
+          </div>
+        </div>
+      )}
 
       <div className="overflow-x-auto rounded-2xl border border-border shadow-sm">
         <table className="min-w-full text-sm">
           <thead>
             <tr className="border-b border-border bg-secondary/50 text-xs text-muted-foreground uppercase tracking-wider">
-              <th className="px-4 py-3 text-left">Phone</th>
+              <th className="px-4 py-3 text-left">Mobile Model</th>
               <th className="px-4 py-3 text-left hidden sm:table-cell">Brand</th>
-              <th className="px-4 py-3 text-left hidden md:table-cell">RAM / Storage</th>
-              <th className="px-4 py-3 text-left">Price</th>
+              <th className="px-4 py-3 text-left hidden md:table-cell">Specs / Details</th>
               <th className="px-4 py-3 text-right">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
-            {filtered.slice(0, 25).map((p) => (
+            {filtered.slice(0, 30).map((p) => (
               <tr key={p.id} className="bg-card hover:bg-secondary/40 transition-colors">
-                <td className="px-4 py-3 font-medium">{p.name}</td>
+                <td className="px-4 py-3 font-medium">
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={p.image}
+                      alt={p.name}
+                      className="h-9 w-9 rounded-lg object-contain bg-secondary p-1 border border-border"
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).src = "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=100&q=80";
+                      }}
+                    />
+                    <div>
+                      <p className="font-bold text-foreground">{p.name}</p>
+                      {p.description && <p className="text-xs text-muted-foreground line-clamp-1">{p.description}</p>}
+                    </div>
+                  </div>
+                </td>
                 <td className="px-4 py-3 text-muted-foreground hidden sm:table-cell">{p.brand}</td>
-                <td className="px-4 py-3 text-muted-foreground hidden md:table-cell">{p.ram} / {p.storage}</td>
-                <td className="px-4 py-3 font-bold text-primary">{fmt(p.price)}</td>
+                <td className="px-4 py-3 text-muted-foreground hidden md:table-cell">{p.ram || "—"} / {p.storage || "—"}</td>
                 <td className="px-4 py-3 text-right">
                   <div className="flex justify-end gap-2">
                     <button
                       onClick={() => { setEditing(p); setNotice(""); }}
-                      className="rounded-lg border border-border bg-background p-1.5 text-muted-foreground hover:text-foreground hover:bg-secondary transition"
+                      className="rounded-lg border border-border bg-background p-1.5 text-muted-foreground hover:text-foreground hover:bg-secondary transition cursor-pointer"
                     >
                       <Edit2 className="h-3.5 w-3.5" />
                     </button>
                     <button
-                      onClick={() => setNotice(`"${p.name}" would be deleted. Connect Firebase to enable real deletions.`)}
-                      className="rounded-lg border border-destructive/30 bg-background p-1.5 text-destructive/70 hover:text-destructive hover:bg-destructive/10 transition"
+                      onClick={() => { setPhones((prev) => prev.filter((ph) => ph.id !== p.id)); setNotice(`"${p.name}" delete ho gaya.`); }}
+                      className="rounded-lg border border-destructive/30 bg-background p-1.5 text-destructive/70 hover:text-destructive hover:bg-destructive/10 transition cursor-pointer"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                     </button>
@@ -303,25 +480,58 @@ function PhonesTab() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={() => setEditing(null)}>
           <div className="w-full max-w-lg rounded-2xl border border-border bg-card p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
             <div className="mb-4 flex items-center justify-between">
-              <h3 className="font-display text-lg font-bold">Edit Phone</h3>
-              <button onClick={() => setEditing(null)}><X className="h-5 w-5 text-muted-foreground" /></button>
+              <h3 className="font-display text-lg font-bold">Edit Mobile</h3>
+              <button onClick={() => setEditing(null)} className="cursor-pointer"><X className="h-5 w-5 text-muted-foreground" /></button>
             </div>
             <div className="grid grid-cols-2 gap-3">
-              {(["name","brand","price","ram","storage","display","battery","chip","camera"] as (keyof PhoneItem)[]).map((field) => (
-                <div key={field} className={field === "name" ? "col-span-2" : ""}>
-                  <label className="mb-1 block text-xs font-semibold capitalize text-muted-foreground">{field}</label>
-                  <input
-                    defaultValue={String(editing[field])}
-                    className="h-9 w-full rounded-lg border border-border bg-secondary px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
-                  />
-                </div>
-              ))}
+              <div className="col-span-2">
+                <label className="mb-1 block text-xs font-semibold text-muted-foreground">Mobile Model / Name</label>
+                <input
+                  defaultValue={editing.name}
+                  id="edit_name"
+                  className="h-9 w-full rounded-lg border border-border bg-secondary px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                />
+              </div>
+              <div className="col-span-2">
+                <label className="mb-1 block text-xs font-semibold text-muted-foreground">Description (Optional)</label>
+                <textarea
+                  defaultValue={editing.description || ""}
+                  id="edit_description"
+                  rows={2}
+                  className="w-full rounded-lg border border-border bg-secondary p-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-xs font-semibold text-muted-foreground">Brand</label>
+                <input
+                  defaultValue={editing.brand}
+                  id="edit_brand"
+                  className="h-9 w-full rounded-lg border border-border bg-secondary px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-xs font-semibold text-muted-foreground">Image URL</label>
+                <input
+                  defaultValue={editing.image}
+                  id="edit_image"
+                  className="h-9 w-full rounded-lg border border-border bg-secondary px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                />
+              </div>
             </div>
             <div className="mt-5 flex justify-end gap-2">
-              <button onClick={() => setEditing(null)} className="rounded-xl border border-border px-5 py-2 text-sm font-medium text-foreground hover:bg-secondary transition">Cancel</button>
+              <button onClick={() => setEditing(null)} className="rounded-xl border border-border px-5 py-2 text-sm font-medium text-foreground hover:bg-secondary transition cursor-pointer">Cancel</button>
               <button
-                onClick={() => { setEditing(null); setNotice("Changes saved (demo). Connect Firebase to persist changes."); }}
-                className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90"
+                onClick={() => {
+                  const newName = (document.getElementById("edit_name") as HTMLInputElement)?.value || editing.name;
+                  const newDesc = (document.getElementById("edit_description") as HTMLTextAreaElement)?.value || "";
+                  const newBrand = (document.getElementById("edit_brand") as HTMLInputElement)?.value || editing.brand;
+                  const newImg = (document.getElementById("edit_image") as HTMLInputElement)?.value || editing.image;
+
+                  setPhones((prev) => prev.map((ph) => ph.id === editing.id ? { ...ph, name: newName, description: newDesc, brand: newBrand, image: newImg } : ph));
+                  setEditing(null);
+                  setNotice(`✅ "${newName}" update ho gaya!`);
+                }}
+                className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90 cursor-pointer"
               >
                 <Save className="h-4 w-4" /> Save
               </button>
@@ -333,25 +543,194 @@ function PhonesTab() {
   );
 }
 
-function AccessoriesTab() {
+function KeypadTab({ keypadPhones, setKeypadPhones }: { keypadPhones: KeypadPhone[]; setKeypadPhones: React.Dispatch<React.SetStateAction<KeypadPhone[]>> }) {
+  const [search, setSearch] = useState("");
+  const [notice, setNotice] = useState("");
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [newKeypad, setNewKeypad] = useState({ name: "", brand: "Nokia", description: "", image: "" });
+
+  const filtered = useMemo(() => {
+    return keypadPhones.filter((k) => {
+      return search.trim() === "" || k.name.toLowerCase().includes(search.toLowerCase()) || k.brand.toLowerCase().includes(search.toLowerCase());
+    });
+  }, [search, keypadPhones]);
+
+  const handleAddKeypad = () => {
+    if (!newKeypad.name.trim() && !newKeypad.description.trim()) {
+      setNotice("⚠️ Kam az kam Keypad Phone ka naam ya description likhein.");
+      return;
+    }
+    const name = newKeypad.name.trim() || newKeypad.description.trim().slice(0, 25) || "Keypad Phone";
+    const newPhone: KeypadPhone = {
+      id: "kp_" + Date.now(),
+      name,
+      brand: newKeypad.brand.trim() || "Nokia",
+      description: newKeypad.description.trim() || undefined,
+      image: newKeypad.image.trim() || "https://images.unsplash.com/photo-1580910051074-3eb694886505?w=400&q=80",
+    };
+    setKeypadPhones((prev) => [newPhone, ...prev]);
+    setNewKeypad({ name: "", brand: "Nokia", description: "", image: "" });
+    setShowAddForm(false);
+    setNotice(`✅ Keypad Phone "${name}" add ho gaya!`);
+  };
+
   return (
-    <div className="space-y-4">
-      <p className="text-xs text-muted-foreground">Showing {ACCESSORIES.length} accessories. Connect Firebase to enable real edits.</p>
+    <div className="space-y-5">
+      {notice && (
+        <div className={`flex items-center justify-between rounded-xl px-4 py-3 text-sm border ${notice.startsWith("✅") ? "bg-emerald-500/15 border-emerald-500/30 text-emerald-400" : "bg-amber-500/15 border-amber-500/30 text-amber-400"}`}>
+          {notice}
+          <button onClick={() => setNotice("")}><X className="h-4 w-4" /></button>
+        </div>
+      )}
+
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="relative">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search keypad phones…"
+            className="h-9 rounded-full border border-border bg-secondary pl-9 pr-4 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+          />
+        </div>
+        <div className="flex items-center gap-2">
+          <p className="text-xs text-muted-foreground">{filtered.length} keypad phones</p>
+          <button
+            onClick={() => { setShowAddForm(!showAddForm); setNotice(""); }}
+            className="inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs font-bold text-primary-foreground shadow transition hover:bg-primary/90 cursor-pointer"
+          >
+            {showAddForm ? <X className="h-3.5 w-3.5" /> : <Plus className="h-3.5 w-3.5" />}
+            {showAddForm ? "Cancel" : "Add Keypad Phone"}
+          </button>
+        </div>
+      </div>
+
+      {/* Add Keypad Form */}
+      {showAddForm && (
+        <div className="rounded-2xl border border-primary/30 bg-card p-5 shadow-md space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="font-display text-base font-bold text-primary">Naya Keypad (Button) Phone Add Karein</h3>
+            <span className="text-xs text-emerald-400 font-medium">✓ Jo bhi detail likhein ge upload ho jaye gi</span>
+          </div>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div className="sm:col-span-2">
+              <label className="mb-1 block text-xs font-semibold text-foreground">Phone Model / Name</label>
+              <input
+                placeholder="e.g. Nokia 105 (2024), Samsung Guru Music"
+                value={newKeypad.name}
+                onChange={(e) => setNewKeypad((p) => ({ ...p, name: e.target.value }))}
+                className="h-10 w-full rounded-lg border border-primary/50 bg-secondary px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-semibold text-muted-foreground">Brand (Nokia, Samsung, itel, Jazz, QMobile...)</label>
+              <input
+                placeholder="e.g. Nokia"
+                value={newKeypad.brand}
+                onChange={(e) => setNewKeypad((p) => ({ ...p, brand: e.target.value }))}
+                className="h-9 w-full rounded-lg border border-border bg-secondary px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-semibold text-muted-foreground">Photo URL (Optional)</label>
+              <input
+                placeholder="https://... (image link)"
+                value={newKeypad.image}
+                onChange={(e) => setNewKeypad((p) => ({ ...p, image: e.target.value }))}
+                className="h-9 w-full rounded-lg border border-border bg-secondary px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+              />
+            </div>
+            <div className="sm:col-span-2">
+              <label className="mb-1 block text-xs font-semibold text-muted-foreground">Description / Details (Optional)</label>
+              <textarea
+                placeholder="Dual SIM, PTA Approved, Battery backup waghaira..."
+                rows={2}
+                value={newKeypad.description}
+                onChange={(e) => setNewKeypad((p) => ({ ...p, description: e.target.value }))}
+                className="w-full rounded-lg border border-border bg-secondary p-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+              />
+            </div>
+          </div>
+          <div className="flex justify-end gap-2 pt-2">
+            <button onClick={() => setShowAddForm(false)} className="rounded-xl border border-border px-5 py-2 text-sm font-medium text-foreground hover:bg-secondary transition cursor-pointer">Cancel</button>
+            <button
+              onClick={handleAddKeypad}
+              className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90 cursor-pointer"
+            >
+              <Save className="h-4 w-4" /> Upload Keypad Phone
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="overflow-x-auto rounded-2xl border border-border shadow-sm">
         <table className="min-w-full text-sm">
           <thead>
             <tr className="border-b border-border bg-secondary/50 text-xs text-muted-foreground uppercase tracking-wider">
-              <th className="px-4 py-3 text-left">Item</th>
+              <th className="px-4 py-3 text-left">Keypad Model</th>
+              <th className="px-4 py-3 text-left">Brand</th>
+              <th className="px-4 py-3 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border">
+            {filtered.map((kp) => (
+              <tr key={kp.id} className="bg-card hover:bg-secondary/40 transition-colors">
+                <td className="px-4 py-3 font-medium">
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={kp.image}
+                      alt={kp.name}
+                      className="h-9 w-9 rounded-lg object-contain bg-secondary p-1 border border-border"
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).src = "https://images.unsplash.com/photo-1580910051074-3eb694886505?w=100&q=80";
+                      }}
+                    />
+                    <div>
+                      <p className="font-bold text-foreground">{kp.name}</p>
+                      {kp.description && <p className="text-xs text-muted-foreground">{kp.description}</p>}
+                    </div>
+                  </div>
+                </td>
+                <td className="px-4 py-3 text-muted-foreground">{kp.brand}</td>
+                <td className="px-4 py-3 text-right">
+                  <button
+                    onClick={() => {
+                      setKeypadPhones((prev) => prev.filter((k) => k.id !== kp.id));
+                      setNotice(`"${kp.name}" delete ho gaya.`);
+                    }}
+                    className="rounded-lg border border-destructive/30 bg-background p-1.5 text-destructive/70 hover:text-destructive hover:bg-destructive/10 transition cursor-pointer"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+function AccessoriesTab() {
+  return (
+    <div className="space-y-4">
+      <p className="text-xs text-muted-foreground">Showing {ACCESSORIES.length} accessories available in store.</p>
+      <div className="overflow-x-auto rounded-2xl border border-border shadow-sm">
+        <table className="min-w-full text-sm">
+          <thead>
+            <tr className="border-b border-border bg-secondary/50 text-xs text-muted-foreground uppercase tracking-wider">
+              <th className="px-4 py-3 text-left">Item Name</th>
               <th className="px-4 py-3 text-left hidden sm:table-cell">Category</th>
-              <th className="px-4 py-3 text-left">Price</th>
+              <th className="px-4 py-3 text-left">Description</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
             {ACCESSORIES.map((a) => (
               <tr key={a.id} className="bg-card hover:bg-secondary/40 transition-colors">
-                <td className="px-4 py-3 font-medium">{a.emoji} {a.name}</td>
+                <td className="px-4 py-3 font-medium whitespace-nowrap">{a.emoji} {a.name}</td>
                 <td className="px-4 py-3 text-muted-foreground hidden sm:table-cell">{a.category}</td>
-                <td className="px-4 py-3 font-bold text-primary">{a.price}</td>
+                <td className="px-4 py-3 text-xs text-muted-foreground">{a.desc}</td>
               </tr>
             ))}
           </tbody>
@@ -364,7 +743,7 @@ function AccessoriesTab() {
 function ServicesTab() {
   return (
     <div className="space-y-4">
-      <p className="text-xs text-muted-foreground">Showing {SERVICES.length} services. Connect Firebase to enable real edits.</p>
+      <p className="text-xs text-muted-foreground">Showing {SERVICES.length} expert repair services offered at the shop.</p>
       <div className="grid gap-4 sm:grid-cols-2">
         {SERVICES.map((s) => (
           <div key={s.title} className="rounded-2xl border border-border bg-card p-5 shadow-sm flex gap-4 items-start">
@@ -374,7 +753,7 @@ function ServicesTab() {
             <div>
               <h3 className="font-display text-base font-bold">{s.title}</h3>
               <p className="mt-1 text-xs text-muted-foreground">{s.desc}</p>
-              <p className="mt-2 font-bold text-sm text-primary">{s.price}</p>
+              <p className="mt-2 text-xs font-semibold text-primary">Original Parts • 30-day Warranty</p>
             </div>
           </div>
         ))}

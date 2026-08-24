@@ -67,6 +67,7 @@ export function Header() {
         <nav className="hidden items-center gap-1 rounded-full border border-border bg-secondary/40 px-2 py-1 lg:flex shadow-sm">
           {[
             { href: "#phones", label: "Phones" },
+            { href: "#keypad-phones", label: "Keypad" },
             { href: "#accessories", label: "Accessories" },
             { href: "#services", label: "Repair" },
             { href: "#about", label: "About" },
@@ -110,6 +111,7 @@ export function Header() {
           <nav className="mx-auto flex max-w-7xl flex-col divide-y divide-border px-2 sm:px-4">
             {[
               { href: "#phones", label: "Phones" },
+              { href: "#keypad-phones", label: "Keypad Phones" },
               { href: "#accessories", label: "Accessories" },
               { href: "#services", label: "Repair" },
               { href: "#about", label: "About" },

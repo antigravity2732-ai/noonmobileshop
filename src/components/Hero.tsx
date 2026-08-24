@@ -27,7 +27,7 @@ export function Hero() {
           </span>
           <h1 className="mt-5 font-display text-4xl font-black leading-[1.05] text-white sm:text-5xl lg:text-6xl animate-in fade-in slide-in-from-bottom-5 duration-700 delay-150">
             Original smartphones.<br />
-            <span className="inline-block rounded-md bg-white px-3 py-1 font-black text-black shadow-lg">Honest prices.</span> Master repairs.
+            <span className="inline-block rounded-md bg-white px-3 py-1 font-black text-black shadow-lg">Genuine stock.</span> Master repairs.
           </h1>
           <p className="mt-5 max-w-xl text-base text-white/80 sm:text-lg animate-in fade-in slide-in-from-bottom-6 duration-700 delay-300">
             Budget se le kar mid-range tak — har phone 100% genuine, tested aur warranty ke sath.
