@@ -8,7 +8,9 @@ import logo from "@/assets/logo.png";
 import {
   PHONES, BRANDS, SERVICES, ACCESSORIES, KEYPAD_PHONES,
   PhoneItem, KeypadPhone, DEFAULT_PHONE_IMAGE, fmt,
+  getStoredPhones, saveStoredPhones, getStoredKeypadPhones, saveStoredKeypadPhones,
 } from "@/data/products";
+import { useEffect } from "react";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -82,9 +84,26 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
   const [tab, setTab] = useState<Tab>("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // Maintain state for phones and keypad phones
-  const [phones, setPhones] = useState<PhoneItem[]>(PHONES);
-  const [keypadPhones, setKeypadPhones] = useState<KeypadPhone[]>(KEYPAD_PHONES);
+  // Maintain state for phones and keypad phones synced with storage
+  const [phones, setPhones] = useState<PhoneItem[]>(() => getStoredPhones());
+  const [keypadPhones, setKeypadPhones] = useState<KeypadPhone[]>(() => getStoredKeypadPhones());
+
+  useEffect(() => {
+    const handleSync = () => {
+      setPhones(getStoredPhones());
+      setKeypadPhones(getStoredKeypadPhones());
+    };
+
+    window.addEventListener("noon_phones_updated", handleSync);
+    window.addEventListener("noon_keypad_updated", handleSync);
+    window.addEventListener("storage", handleSync);
+
+    return () => {
+      window.removeEventListener("noon_phones_updated", handleSync);
+      window.removeEventListener("noon_keypad_updated", handleSync);
+      window.removeEventListener("storage", handleSync);
+    };
+  }, []);
 
   const navItems: { id: Tab; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -309,10 +328,14 @@ function PhonesTab({ phones, setPhones }: { phones: PhoneItem[]; setPhones: Reac
       description: newPhone.description.trim() || undefined,
     };
 
-    setPhones((prev) => [phone, ...prev]);
+    setPhones((prev) => {
+      const next = [phone, ...prev];
+      saveStoredPhones(next);
+      return next;
+    });
     setNewPhone({
       name: "",
-      brand: "Apple",
+      brand: "Other",
       customBrand: "",
       price: "",
       ram: "",
@@ -582,7 +605,14 @@ function PhonesTab({ phones, setPhones }: { phones: PhoneItem[]; setPhones: Reac
                       <Edit2 className="h-3.5 w-3.5" />
                     </button>
                     <button
-                      onClick={() => { setPhones((prev) => prev.filter((ph) => ph.id !== p.id)); setNotice(`"${p.name}" deleted.`); }}
+                      onClick={() => {
+                        setPhones((prev) => {
+                          const next = prev.filter((ph) => ph.id !== p.id);
+                          saveStoredPhones(next);
+                          return next;
+                        });
+                        setNotice(`"${p.name}" deleted.`);
+                      }}
                       className="rounded-lg border border-destructive/30 bg-background p-1.5 text-destructive/70 hover:text-destructive hover:bg-destructive/10 transition cursor-pointer"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
@@ -664,14 +694,18 @@ function PhonesTab({ phones, setPhones }: { phones: PhoneItem[]; setPhones: Reac
                   const newImg = (document.getElementById("edit_image") as HTMLInputElement)?.value;
                   const newDesc = (document.getElementById("edit_description") as HTMLTextAreaElement)?.value;
 
-                  setPhones((prev) => prev.map((ph) => ph.id === editing.id ? {
-                    ...ph,
-                    name: newName,
-                    brand: newBrand,
-                    price: newPrice,
-                    image: newImg || DEFAULT_PHONE_IMAGE,
-                    description: newDesc || undefined,
-                  } : ph));
+                  setPhones((prev) => {
+                    const next = prev.map((ph) => ph.id === editing.id ? {
+                      ...ph,
+                      name: newName,
+                      brand: newBrand,
+                      price: newPrice,
+                      image: newImg || DEFAULT_PHONE_IMAGE,
+                      description: newDesc || undefined,
+                    } : ph);
+                    saveStoredPhones(next);
+                    return next;
+                  });
                   setEditing(null);
                   setNotice(`✅ "${newName}" updated successfully!`);
                 }}
@@ -732,7 +766,11 @@ function KeypadTab({ keypadPhones, setKeypadPhones }: { keypadPhones: KeypadPhon
       image: newKeypad.image.trim() || DEFAULT_PHONE_IMAGE,
     };
 
-    setKeypadPhones((prev) => [newPhone, ...prev]);
+    setKeypadPhones((prev) => {
+      const next = [newPhone, ...prev];
+      saveStoredKeypadPhones(next);
+      return next;
+    });
     setNewKeypad({ name: "", brand: "Nokia", customBrand: "", price: "", description: "", image: "" });
     setShowAddModal(false);
     setNotice(`✅ Keypad Phone "${newPhone.name}" added successfully!`);
@@ -907,7 +945,11 @@ function KeypadTab({ keypadPhones, setKeypadPhones }: { keypadPhones: KeypadPhon
                 <td className="px-4 py-3 text-right">
                   <button
                     onClick={() => {
-                      setKeypadPhones((prev) => prev.filter((k) => k.id !== kp.id));
+                      setKeypadPhones((prev) => {
+                        const next = prev.filter((k) => k.id !== kp.id);
+                        saveStoredKeypadPhones(next);
+                        return next;
+                      });
                       setNotice(`"${kp.name}" deleted.`);
                     }}
                     className="rounded-lg border border-destructive/30 bg-background p-1.5 text-destructive/70 hover:text-destructive hover:bg-destructive/10 transition cursor-pointer"

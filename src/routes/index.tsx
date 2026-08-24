@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import {
   MapPin, Clock, Phone, MessageCircle, Search, ChevronDown,
 } from "lucide-react";
@@ -11,7 +11,9 @@ import { Hero } from "@/components/Hero";
 import { ProductCard } from "@/components/ProductCard";
 import { AccessoryCard } from "@/components/AccessoryCard";
 import {
-  PHONES, BRANDS, SERVICES, ACCESSORIES, KEYPAD_PHONES,
+  BRANDS, SERVICES, ACCESSORIES,
+  PhoneItem, KeypadPhone,
+  getStoredPhones, getStoredKeypadPhones,
   WHATSAPP_NUMBER, DISPLAY_NUMBER,
 } from "@/data/products";
 
@@ -34,20 +36,44 @@ const WHATSAPP = (msg: string) =>
 const ACC_CATS = ["All", ...Array.from(new Set(ACCESSORIES.map((a) => a.category)))];
 
 function Home() {
+  const [phones, setPhones] = useState<PhoneItem[]>(() => getStoredPhones());
+  const [keypadPhones, setKeypadPhones] = useState<KeypadPhone[]>(() => getStoredKeypadPhones());
   const [brand, setBrand] = useState("All");
   const [search, setSearch] = useState("");
   const [accCat, setAccCat] = useState("All");
   const [showAllPhones, setShowAllPhones] = useState(false);
 
+  useEffect(() => {
+    const handleSync = () => {
+      setPhones(getStoredPhones());
+      setKeypadPhones(getStoredKeypadPhones());
+    };
+
+    window.addEventListener("noon_phones_updated", handleSync);
+    window.addEventListener("noon_keypad_updated", handleSync);
+    window.addEventListener("storage", handleSync);
+
+    return () => {
+      window.removeEventListener("noon_phones_updated", handleSync);
+      window.removeEventListener("noon_keypad_updated", handleSync);
+      window.removeEventListener("storage", handleSync);
+    };
+  }, []);
+
   const filtered = useMemo(() => {
-    return PHONES.filter((p) => {
-      const matchBrand = brand === "All" || p.brand === brand;
-      const matchSearch = search.trim() === "" || p.name.toLowerCase().includes(search.toLowerCase()) || p.brand.toLowerCase().includes(search.toLowerCase());
+    return phones.filter((p) => {
+      const pBrand = p.brand || "Other";
+      const matchBrand = brand === "All" || pBrand === brand;
+      const matchSearch =
+        search.trim() === "" ||
+        p.name.toLowerCase().includes(search.toLowerCase()) ||
+        pBrand.toLowerCase().includes(search.toLowerCase());
       return matchBrand && matchSearch;
     });
-  }, [brand, search]);
+  }, [phones, brand, search]);
 
   const displayedPhones = showAllPhones ? filtered : filtered.slice(0, 12);
+
 
 
   const filteredAcc = useMemo(
@@ -166,7 +192,7 @@ function Home() {
           </div>
 
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
-            {KEYPAD_PHONES.map((kp) => {
+            {keypadPhones.map((kp) => {
               const kpImg = kp.image && kp.image.trim() !== "" ? kp.image : "https://images.unsplash.com/photo-1580910051074-3eb694886505?w=400&q=80";
               const hasKpPrice = typeof kp.price === "number" && kp.price > 0;
               const kpMsg = hasKpPrice

@@ -31,6 +31,53 @@ export const fmt = (n?: number | null): string => {
   return "Rs. " + n.toLocaleString("en-PK");
 };
 
+export const PHONES_STORAGE_KEY = "noon_smartphones_data_v1";
+export const KEYPAD_STORAGE_KEY = "noon_keypad_phones_data_v1";
+
+export const getStoredPhones = (): PhoneItem[] => {
+  if (typeof window === "undefined") return PHONES;
+  try {
+    const raw = localStorage.getItem(PHONES_STORAGE_KEY);
+    if (!raw) return PHONES;
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) && parsed.length > 0 ? parsed : PHONES;
+  } catch {
+    return PHONES;
+  }
+};
+
+export const saveStoredPhones = (phones: PhoneItem[]): void => {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(PHONES_STORAGE_KEY, JSON.stringify(phones));
+    window.dispatchEvent(new Event("noon_phones_updated"));
+  } catch (e) {
+    console.error("Failed to save phones to storage", e);
+  }
+};
+
+export const getStoredKeypadPhones = (): KeypadPhone[] => {
+  if (typeof window === "undefined") return KEYPAD_PHONES;
+  try {
+    const raw = localStorage.getItem(KEYPAD_STORAGE_KEY);
+    if (!raw) return KEYPAD_PHONES;
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) && parsed.length > 0 ? parsed : KEYPAD_PHONES;
+  } catch {
+    return KEYPAD_PHONES;
+  }
+};
+
+export const saveStoredKeypadPhones = (keypadPhones: KeypadPhone[]): void => {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(KEYPAD_STORAGE_KEY, JSON.stringify(keypadPhones));
+    window.dispatchEvent(new Event("noon_keypad_updated"));
+  } catch (e) {
+    console.error("Failed to save keypad phones to storage", e);
+  }
+};
+
 
 
 
