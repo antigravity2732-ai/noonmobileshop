@@ -387,15 +387,26 @@ function PhonesTab({ phones, setPhones }: { phones: PhoneItem[]; setPhones: Reac
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="mb-1 block text-xs font-semibold text-muted-foreground">Brand</label>
+                  <label className="mb-1 block text-xs font-semibold text-muted-foreground">Brand (Optional)</label>
                   <select
                     value={newPhone.brand}
                     onChange={(e) => setNewPhone((p) => ({ ...p, brand: e.target.value }))}
                     className="h-11 w-full rounded-xl border border-border bg-secondary px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
                   >
-                    {BRAND_OPTIONS.map((b) => (
-                      <option key={b} value={b}>{b}</option>
-                    ))}
+                    <option value="Other">Other / Generic</option>
+                    <option value="Samsung">Samsung</option>
+                    <option value="Apple">Apple</option>
+                    <option value="Xiaomi">Xiaomi</option>
+                    <option value="Infinix">Infinix</option>
+                    <option value="Oppo">Oppo</option>
+                    <option value="Vivo">Vivo</option>
+                    <option value="Tecno">Tecno</option>
+                    <option value="Realme">Realme</option>
+                    <option value="Honor">Honor</option>
+                    <option value="Nokia">Nokia</option>
+                    <option value="itel">itel</option>
+                    <option value="Jazz">Jazz</option>
+                    <option value="QMobile">QMobile</option>
                   </select>
                 </div>
 
@@ -403,7 +414,7 @@ function PhonesTab({ phones, setPhones }: { phones: PhoneItem[]; setPhones: Reac
                   <label className="mb-1 block text-xs font-semibold text-muted-foreground">Price (Rs.) (Optional)</label>
                   <input
                     type="number"
-                    placeholder="Optional"
+                    placeholder="Optional (Khali chor dein)"
                     value={newPhone.price}
                     onChange={(e) => setNewPhone((p) => ({ ...p, price: e.target.value }))}
                     className="h-11 w-full rounded-xl border border-border bg-secondary px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
