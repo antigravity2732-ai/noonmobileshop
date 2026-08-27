@@ -1,8 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   LayoutDashboard, Wrench, ShoppingBag, LogOut,
   Smartphone, Phone, Eye, Edit2, Trash2, Search, X, Save, ChevronDown, Plus,
+  Camera, Upload, Image as ImageIcon,
 } from "lucide-react";
 import logo from "@/assets/logo.png";
 import {
@@ -10,7 +11,6 @@ import {
   PhoneItem, KeypadPhone, DEFAULT_PHONE_IMAGE, fmt,
   getStoredPhones, saveStoredPhones, getStoredKeypadPhones, saveStoredKeypadPhones,
 } from "@/data/products";
-import { useEffect } from "react";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -31,6 +31,166 @@ const BRAND_OPTIONS = [
   "Apple", "Samsung", "Xiaomi", "Infinix", "Oppo", "Vivo", "Tecno",
   "Realme", "Honor", "Nokia", "itel", "Jazz", "QMobile", "Other"
 ];
+
+// Helper to compress camera/uploaded photos so they easily store in browser
+function compressImage(file: File): Promise<string> {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new window.Image();
+      img.src = event.target?.result as string;
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const maxDimension = 600;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > maxDimension) {
+            height = Math.round((height * maxDimension) / width);
+            width = maxDimension;
+          }
+        } else {
+          if (height > maxDimension) {
+            width = Math.round((width * maxDimension) / height);
+            height = maxDimension;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressedDataUrl = canvas.toDataURL("image/jpeg", 0.78);
+          resolve(compressedDataUrl);
+        } else {
+          resolve(event.target?.result as string);
+        }
+      };
+      img.onerror = () => resolve(event.target?.result as string);
+    };
+    reader.onerror = () => resolve("");
+  });
+}
+
+function ImageUploadField({
+  value,
+  onChange,
+  label = "Phone Photo / Image (Upload ya Camera se Lein) (Optional)"
+}: {
+  value: string;
+  onChange: (val: string) => void;
+  label?: string;
+}) {
+  const [mode, setMode] = useState<"file" | "url">("file");
+  const [loading, setLoading] = useState(false);
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setLoading(true);
+    try {
+      const compressed = await compressImage(file);
+      onChange(compressed);
+    } catch {
+      // ignore
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <label className="text-xs font-semibold text-muted-foreground">{label}</label>
+        <div className="flex gap-1 text-[11px]">
+          <button
+            type="button"
+            onClick={() => setMode("file")}
+            className={`px-2 py-0.5 rounded cursor-pointer transition ${mode === "file" ? "bg-primary text-primary-foreground font-semibold" : "text-muted-foreground hover:text-foreground"}`}
+          >
+            📸 Upload / Camera
+          </button>
+          <button
+            type="button"
+            onClick={() => setMode("url")}
+            className={`px-2 py-0.5 rounded cursor-pointer transition ${mode === "url" ? "bg-primary text-primary-foreground font-semibold" : "text-muted-foreground hover:text-foreground"}`}
+          >
+            🔗 URL Link
+          </button>
+        </div>
+      </div>
+
+      {mode === "file" ? (
+        <div className="flex flex-col gap-2">
+          {value ? (
+            <div className="relative flex items-center gap-3 p-2.5 rounded-xl border border-border bg-secondary">
+              <img
+                src={value}
+                alt="Preview"
+                className="h-16 w-16 rounded-lg object-contain bg-background border border-border shrink-0"
+              />
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-bold text-emerald-400">✓ Photo Selected</p>
+                <p className="text-[11px] text-muted-foreground truncate">Photo upload hone ke liye ready hai</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => onChange("")}
+                className="p-1.5 rounded-lg border border-destructive/30 text-destructive hover:bg-destructive/10 transition cursor-pointer shrink-0"
+                title="Remove photo"
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
+            </div>
+          ) : (
+            <label className="flex flex-col items-center justify-center p-4 border-2 border-dashed border-border hover:border-primary/50 rounded-2xl bg-secondary/50 hover:bg-secondary transition cursor-pointer text-center group">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="hidden"
+              />
+              {loading ? (
+                <div className="py-2 text-xs text-primary animate-pulse">Photo processing ho rahi hai...</div>
+              ) : (
+                <>
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <span className="p-2 rounded-full bg-primary/15 text-primary group-hover:scale-110 transition">
+                      <Camera className="h-5 w-5" />
+                    </span>
+                    <span className="p-2 rounded-full bg-primary/15 text-primary group-hover:scale-110 transition">
+                      <Upload className="h-5 w-5" />
+                    </span>
+                  </div>
+                  <p className="text-xs font-semibold text-foreground">
+                    Mobile se Photo khainchein ya Gallery se Upload karein
+                  </p>
+                  <p className="text-[10px] text-muted-foreground mt-0.5">
+                    Click karke camera ya gallery open karein (Optional)
+                  </p>
+                </>
+              )}
+            </label>
+          )}
+        </div>
+      ) : (
+        <div>
+          <input
+            type="url"
+            placeholder="https://example.com/phone.jpg"
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            className="h-10 w-full rounded-xl border border-border bg-secondary px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
 
 function AdminPanel() {
   const [authed, setAuthed] = useState(false);
@@ -256,6 +416,7 @@ function PhonesTab({ phones, setPhones }: { phones: PhoneItem[]; setPhones: Reac
   const [search, setSearch] = useState("");
   const [brand, setBrand] = useState("All");
   const [editing, setEditing] = useState<PhoneItem | null>(null);
+  const [editImage, setEditImage] = useState("");
   const [notice, setNotice] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
 
@@ -515,17 +676,11 @@ function PhonesTab({ phones, setPhones }: { phones: PhoneItem[]; setPhones: Reac
                 </div>
               </div>
 
-              <div>
-                <label className="mb-1 block text-xs font-semibold text-muted-foreground">Image URL (Optional)</label>
-                <input
-                  type="url"
-                  placeholder="https://example.com/phone.jpg"
-                  value={newPhone.image}
-                  onChange={(e) => setNewPhone((p) => ({ ...p, image: e.target.value }))}
-                  className="h-10 w-full rounded-xl border border-border bg-secondary px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
-                />
-                <p className="mt-1 text-[11px] text-muted-foreground">Tip: imgbb.com par image upload karke link copy karein.</p>
-              </div>
+              <ImageUploadField
+                value={newPhone.image}
+                onChange={(val) => setNewPhone((p) => ({ ...p, image: val }))}
+                label="Phone Photo (Upload / Camera) (Optional)"
+              />
 
               <div>
                 <label className="mb-1 block text-xs font-semibold text-muted-foreground">Description (Optional)</label>
@@ -599,7 +754,7 @@ function PhonesTab({ phones, setPhones }: { phones: PhoneItem[]; setPhones: Reac
                 <td className="px-4 py-3 text-right">
                   <div className="flex justify-end gap-2">
                     <button
-                      onClick={() => { setEditing(p); setNotice(""); }}
+                      onClick={() => { setEditing(p); setEditImage(p.image || ""); setNotice(""); }}
                       className="rounded-lg border border-border bg-background p-1.5 text-muted-foreground hover:text-foreground hover:bg-secondary transition cursor-pointer"
                     >
                       <Edit2 className="h-3.5 w-3.5" />
@@ -663,14 +818,11 @@ function PhonesTab({ phones, setPhones }: { phones: PhoneItem[]; setPhones: Reac
                 </div>
               </div>
 
-              <div>
-                <label className="mb-1 block text-xs font-semibold text-muted-foreground">Image URL (Optional)</label>
-                <input
-                  defaultValue={editing.image || ""}
-                  id="edit_image"
-                  className="h-10 w-full rounded-xl border border-border bg-secondary px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
-                />
-              </div>
+              <ImageUploadField
+                value={editImage}
+                onChange={setEditImage}
+                label="Phone Photo (Upload / Camera) (Optional)"
+              />
 
               <div>
                 <label className="mb-1 block text-xs font-semibold text-muted-foreground">Description (Optional)</label>
@@ -691,7 +843,6 @@ function PhonesTab({ phones, setPhones }: { phones: PhoneItem[]; setPhones: Reac
                   const newBrand = (document.getElementById("edit_brand") as HTMLInputElement)?.value || "Other";
                   const priceStr = (document.getElementById("edit_price") as HTMLInputElement)?.value;
                   const newPrice = priceStr && Number(priceStr) > 0 ? Number(priceStr) : undefined;
-                  const newImg = (document.getElementById("edit_image") as HTMLInputElement)?.value;
                   const newDesc = (document.getElementById("edit_description") as HTMLTextAreaElement)?.value;
 
                   setPhones((prev) => {
@@ -700,7 +851,7 @@ function PhonesTab({ phones, setPhones }: { phones: PhoneItem[]; setPhones: Reac
                       name: newName,
                       brand: newBrand,
                       price: newPrice,
-                      image: newImg || DEFAULT_PHONE_IMAGE,
+                      image: editImage || DEFAULT_PHONE_IMAGE,
                       description: newDesc || undefined,
                     } : ph);
                     saveStoredPhones(next);
@@ -866,16 +1017,11 @@ function KeypadTab({ keypadPhones, setKeypadPhones }: { keypadPhones: KeypadPhon
                 </div>
               )}
 
-              <div>
-                <label className="mb-1 block text-xs font-semibold text-muted-foreground">Image URL (Optional)</label>
-                <input
-                  type="url"
-                  placeholder="https://... (image link or leave empty)"
-                  value={newKeypad.image}
-                  onChange={(e) => setNewKeypad((p) => ({ ...p, image: e.target.value }))}
-                  className="h-10 w-full rounded-xl border border-border bg-secondary px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
-                />
-              </div>
+              <ImageUploadField
+                value={newKeypad.image}
+                onChange={(val) => setNewKeypad((p) => ({ ...p, image: val }))}
+                label="Phone Photo (Upload / Camera) (Optional)"
+              />
 
               <div>
                 <label className="mb-1 block text-xs font-semibold text-muted-foreground">Description / Features (Optional)</label>
